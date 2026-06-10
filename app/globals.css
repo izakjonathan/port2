@@ -2414,3 +2414,171 @@ body{
     padding:80px 16px 150px;
   }
 }
+
+
+/* =====================================================
+   GLOBAL TYPE + FIXED MENU SYSTEM
+   Edit this block first for broad typography changes.
+   Few controls. Many elements inherit from these tokens.
+   ===================================================== */
+
+:root{
+  --font-main: Arial, Helvetica, sans-serif;
+  --type-menu: clamp(18px, 2.2vw, 32px);
+  --type-display: clamp(44px, 5.9vw, 86px);
+  --type-section: clamp(58px, 9.5vw, 140px);
+  --type-card-title: clamp(30px, 4vw, 60px);
+  --type-card-body: 18px;
+  --type-meta: 12px;
+  --tracking-tight: -0.09em;
+  --tracking-title: -0.08em;
+  --tracking-meta: 0.08em;
+  --line-tight: 0.84;
+  --line-body: 1.05;
+  --menu-x: 34px;
+  --menu-top: 118px;
+  --menu-bottom: 34px;
+  --menu-z: 9999;
+}
+
+html,
+body,
+.ref3-site{
+  font-family:var(--font-main) !important;
+}
+
+.site-menu{
+  position:fixed;
+  left:0;
+  right:0;
+  z-index:var(--menu-z);
+  pointer-events:none;
+  mix-blend-mode:difference;
+}
+
+.site-menu-top{top:var(--menu-top);}
+.site-menu-bottom{bottom:var(--menu-bottom);}
+
+.site-menu-inner{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 var(--menu-x);
+}
+
+.site-menu-link{
+  pointer-events:auto;
+  color:#fff;
+  font-size:var(--type-menu);
+  line-height:1;
+  letter-spacing:-.06em;
+  text-decoration:none;
+  font-weight:400;
+}
+
+.site-menu-brand{font-weight:800;}
+
+.ref3-corner{
+  display:none !important;
+}
+
+.ref3-pink h1{
+  font-size:var(--type-display) !important;
+  line-height:var(--line-tight) !important;
+  letter-spacing:var(--tracking-tight) !important;
+}
+
+.ref3-work-heading h2{
+  font-size:var(--type-section) !important;
+  line-height:.78 !important;
+  letter-spacing:var(--tracking-tight) !important;
+}
+
+.ref3-project h3{
+  font-size:var(--type-card-title) !important;
+  line-height:var(--line-tight) !important;
+  letter-spacing:var(--tracking-title) !important;
+}
+
+.ref3-project p,
+.ref3-service p{
+  font-size:var(--type-card-body) !important;
+  line-height:var(--line-body) !important;
+}
+
+.ref3-project footer,
+.ref3-mini-nav,
+.ref3-card-footer,
+.ref3-service span{
+  font-size:var(--type-meta) !important;
+}
+
+/* Reference label helper: scoped so it does not break fixed navigation */
+.ref3-card[data-ref],
+.ref3-project[data-ref],
+.ref3-service[data-ref],
+.ref3-work[data-ref],
+.ref3-services[data-ref]{
+  position:relative;
+}
+
+.ref3-card[data-ref]:hover::after,
+.ref3-project[data-ref]:hover::after,
+.ref3-service[data-ref]:hover::after,
+.ref3-work[data-ref]:hover::after,
+.ref3-services[data-ref]:hover::after{
+  content:attr(data-ref);
+  position:absolute;
+  left:12px;
+  top:12px;
+  z-index:99999;
+  max-width:260px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#b9ff00;
+  color:#000;
+  font-size:11px;
+  line-height:1;
+  letter-spacing:0;
+  font-weight:800;
+  pointer-events:none;
+  box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+
+@media(max-width:900px){
+  :root{
+    --type-menu: 28px;
+    --type-display: 43px;
+    --type-section: 72px;
+    --type-card-title: 38px;
+    --type-card-body: 18px;
+    --menu-x: 22px;
+    --menu-top: 112px;
+    --menu-bottom: 122px;
+  }
+}
+
+
+/* MENU FIX: data-ref helper must never override fixed menu positioning */
+.site-menu.site-menu-top{
+  position:fixed !important;
+  top:var(--menu-top) !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:999999 !important;
+  display:block !important;
+}
+
+.site-menu.site-menu-bottom{
+  position:fixed !important;
+  bottom:var(--menu-bottom) !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:999999 !important;
+  display:block !important;
+}
+
+.site-menu .site-menu-inner{
+  position:relative !important;
+}
