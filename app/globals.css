@@ -2582,3 +2582,302 @@ body,
 .site-menu .site-menu-inner{
   position:relative !important;
 }
+
+
+/* =====================================================
+   V5 FIX — MENU, LABELS, OVERLAP
+   - Card labels are hidden visually but references remain in code.
+   - Fixed menu restored at small old-version scale.
+   - Hero objects pulled back together with stronger overlap.
+   ===================================================== */
+
+/* Hide visible green reference pills everywhere */
+[data-ref]::after,
+[data-ref]:hover::after,
+.ref3-card::after,
+.ref3-project::after,
+.ref3-service::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Fixed header/footer menu — smaller and clean */
+.site-menu{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:99999 !important;
+  pointer-events:none !important;
+  mix-blend-mode:normal !important;
+}
+
+.site-menu-top{
+  top:92px !important;
+}
+
+.site-menu-bottom{
+  bottom:92px !important;
+}
+
+.site-menu-inner{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  padding:0 34px !important;
+}
+
+.site-menu-link{
+  pointer-events:auto !important;
+  color:#111 !important;
+  font-size:26px !important;
+  line-height:1 !important;
+  letter-spacing:-.055em !important;
+  font-weight:400 !important;
+  text-decoration:none !important;
+}
+
+.site-menu-brand{
+  font-weight:800 !important;
+}
+
+/* Hide old corner labels fully */
+.ref3-corner,
+.audio-label,
+.corner-label{
+  display:none !important;
+}
+
+/* Restore tight first-draft composition */
+.ref3-hero{
+  min-height:100svh !important;
+  overflow:hidden !important;
+}
+
+.ref3-pink{
+  left:50% !important;
+  top:92px !important;
+  width:min(48vw,720px) !important;
+  height:70vh !important;
+  min-height:590px !important;
+  transform:translateX(-42%) rotate(3deg) !important;
+  z-index:20 !important;
+}
+
+.ref3-yellow{
+  left:7vw !important;
+  top:46vh !important;
+  width:min(34vw,430px) !important;
+  min-height:278px !important;
+  z-index:35 !important;
+  transform:rotate(-5deg) !important;
+}
+
+.ref3-white{
+  right:5vw !important;
+  top:15vh !important;
+  width:min(31vw,430px) !important;
+  min-height:56vh !important;
+  z-index:8 !important;
+  transform:rotate(-4deg) !important;
+}
+
+.ref3-black{
+  right:26vw !important;
+  top:35vh !important;
+  z-index:45 !important;
+  transform:rotate(-8deg) !important;
+}
+
+.ref3-red{
+  left:31vw !important;
+  top:39vh !important;
+  z-index:4 !important;
+}
+
+/* Reduce symbol dominance so supporting cards remain visible */
+.ref3-symbol{
+  left:15% !important;
+  right:13% !important;
+  bottom:18% !important;
+  height:34% !important;
+  border-width:12px !important;
+}
+.ref3-symbol::before,
+.ref3-symbol::after{
+  border-width:12px !important;
+}
+.ref3-symbol span{
+  border-width:9px !important;
+}
+
+/* Reduce vertical gaps between main sections */
+.ref3-work,
+.ref3-services{
+  margin-top:-80px !important;
+  padding-top:70px !important;
+}
+
+/* Mobile-specific composition repair */
+@media(max-width:900px){
+  .site-menu-top{
+    top:118px !important;
+  }
+
+  .site-menu-bottom{
+    bottom:104px !important;
+  }
+
+  .site-menu-inner{
+    padding:0 34px !important;
+  }
+
+  .site-menu-link{
+    font-size:26px !important;
+  }
+
+  .ref3-hero{
+    min-height:980px !important;
+  }
+
+  .ref3-pink{
+    top:168px !important;
+    left:50% !important;
+    width:74vw !important;
+    height:535px !important;
+    min-height:535px !important;
+    transform:translateX(-43%) rotate(3deg) !important;
+    z-index:20 !important;
+  }
+
+  .ref3-pink h1{
+    font-size:43px !important;
+  }
+
+  .ref3-symbol{
+    left:15% !important;
+    right:13% !important;
+    bottom:90px !important;
+    height:28% !important;
+    border-width:9px !important;
+  }
+
+  .ref3-symbol::before,
+  .ref3-symbol::after{
+    border-width:9px !important;
+  }
+
+  .ref3-symbol span{
+    border-width:7px !important;
+  }
+
+  .ref3-yellow{
+    left:6vw !important;
+    top:540px !important;
+    width:56vw !important;
+    min-height:250px !important;
+    z-index:38 !important;
+  }
+
+  .ref3-white{
+    right:2vw !important;
+    top:690px !important;
+    width:62vw !important;
+    min-height:355px !important;
+    z-index:12 !important;
+  }
+
+  .ref3-black{
+    right:7vw !important;
+    top:520px !important;
+    width:155px !important;
+    height:82px !important;
+    z-index:46 !important;
+  }
+
+  .ref3-red{
+    left:43vw !important;
+    top:458px !important;
+    width:132px !important;
+    height:330px !important;
+  }
+
+  .ref3-work{
+    margin-top:-60px !important;
+    padding-top:50px !important;
+  }
+
+  .ref3-services{
+    margin-top:-120px !important;
+    padding-top:40px !important;
+  }
+
+  .ref3-work-stage{
+    min-height:1180px !important;
+  }
+
+  .ref3-project{
+    min-height:255px !important;
+  }
+
+  .ref3-project-1{
+    left:4vw !important;
+    top:20px !important;
+    width:76vw !important;
+  }
+
+  .ref3-project-2{
+    right:3vw !important;
+    top:245px !important;
+    width:74vw !important;
+  }
+
+  .ref3-project-3{
+    left:16vw !important;
+    top:475px !important;
+    width:74vw !important;
+  }
+
+  .ref3-project-4{
+    right:4vw !important;
+    top:705px !important;
+    width:74vw !important;
+  }
+
+  .ref3-project-5{
+    left:5vw !important;
+    top:930px !important;
+    width:76vw !important;
+  }
+
+  .ref3-service-stage{
+    min-height:980px !important;
+  }
+
+  .ref3-service{
+    min-height:260px !important;
+  }
+
+  .ref3-service-yellow{
+    left:4vw !important;
+    top:0 !important;
+    width:76vw !important;
+  }
+
+  .ref3-service-pink{
+    left:18vw !important;
+    top:220px !important;
+    width:76vw !important;
+  }
+
+  .ref3-service-black{
+    right:4vw !important;
+    top:440px !important;
+    width:76vw !important;
+  }
+
+  .ref3-service-white{
+    left:6vw !important;
+    top:660px !important;
+    width:76vw !important;
+  }
+}
