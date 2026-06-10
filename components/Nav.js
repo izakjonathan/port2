@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Nav() {
   return (
     <>
-      <header className="fixed-menu fixed-menu-header">
+      <header className="fixed-menu fixed-menu-header" aria-label="Primary">
         <div className="fixed-menu-inner">
           <Link href="/" className="fixed-menu-link fixed-menu-brand">
             IZAK HYLLESTED
@@ -14,7 +14,7 @@ export default function Nav() {
         </div>
       </header>
 
-      <footer className="fixed-menu fixed-menu-footer">
+      <footer className="fixed-menu fixed-menu-footer" aria-label="Footer">
         <div className="fixed-menu-inner">
           <a href="mailto:izakhyllested@icloud.com" className="fixed-menu-link">
             CONTACT

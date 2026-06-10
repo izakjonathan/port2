@@ -1,0 +1,1 @@
+Full consolidation: app/globals.css was replaced with one canonical stylesheet only. All duplicate old menu/debug/control CSS removed. Header/footer use safe-area based fixed positioning close to top/bottom. Nav component rebuilt cleanly.
