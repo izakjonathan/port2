@@ -3,23 +3,23 @@ import Link from "next/link";
 export default function Nav() {
   return (
     <>
-      <header className="site-menu site-menu-top" data-ref="MENU-H — Fixed Header">
-        <div className="site-menu-inner">
-          <Link href="/" className="site-menu-link site-menu-brand" data-ref="H1 — Identity">
+      <header className="fixed-menu fixed-menu-header">
+        <div className="fixed-menu-inner">
+          <Link href="/" className="fixed-menu-link fixed-menu-brand">
             IZAK HYLLESTED
           </Link>
-          <a href="#about" className="site-menu-link" data-ref="H2 — About">
+          <a href="#about" className="fixed-menu-link">
             ABOUT
           </a>
         </div>
       </header>
 
-      <footer className="site-menu site-menu-bottom" data-ref="MENU-F — Fixed Footer">
-        <div className="site-menu-inner">
-          <a href="mailto:izakhyllested@icloud.com" className="site-menu-link" data-ref="F1 — Contact">
+      <footer className="fixed-menu fixed-menu-footer">
+        <div className="fixed-menu-inner">
+          <a href="mailto:izakhyllested@icloud.com" className="fixed-menu-link">
             CONTACT
           </a>
-          <Link href="/projects" className="site-menu-link" data-ref="F2 — Projects">
+          <Link href="/projects" className="fixed-menu-link">
             PROJECTS
           </Link>
         </div>

@@ -1,0 +1,1 @@
+Added fixed header/footer menu, card reference labels/data-ref attributes, CARD_REFERENCES.md, and global typography token controls at the bottom of app/globals.css.

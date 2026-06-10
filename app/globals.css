@@ -2881,3 +2881,419 @@ body,
     width:76vw !important;
   }
 }
+
+
+/* =====================================================
+   V6 HARD CONSOLIDATION
+   WHY THIS EXISTS:
+   1. Old [data-ref] hover CSS created visible green labels on mobile.
+   2. site-menu inherited conflicting data-ref/position systems.
+   3. Menu size was controlled by multiple token blocks.
+   4. Mobile card positions were too spread out vertically.
+   This final block removes visual labels, creates one fixed menu system,
+   and forces the hero cards back into a tight first-draft overlap.
+   ===================================================== */
+
+/* Kill all old reference/debug labels even if old CSS remains above */
+[data-ref],
+[data-ref] *,
+[data-ref]::before,
+[data-ref]::after,
+[data-ref]:hover::before,
+[data-ref]:hover::after,
+.ref3-card::before,
+.ref3-card::after,
+.ref3-project::before,
+.ref3-project::after,
+.ref3-service::before,
+.ref3-service::after{
+  content:none !important;
+}
+
+/* Hide previous duplicate menu systems and corner labels */
+.site-menu,
+.ref3-nav,
+.ref3-footer,
+.audio-nav,
+.audio-footer,
+.ref3-corner,
+.audio-label,
+.corner-label{
+  display:none !important;
+}
+
+/* One real fixed header/footer menu */
+.fixed-menu{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:999999 !important;
+  pointer-events:none !important;
+  display:block !important;
+  mix-blend-mode:normal !important;
+}
+
+.fixed-menu-header{
+  top:92px !important;
+}
+
+.fixed-menu-footer{
+  bottom:92px !important;
+}
+
+.fixed-menu-inner{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  width:100% !important;
+  padding:0 34px !important;
+}
+
+.fixed-menu-link{
+  pointer-events:auto !important;
+  color:#151515 !important;
+  text-decoration:none !important;
+  font-family:Arial, Helvetica, sans-serif !important;
+  font-size:17px !important;
+  line-height:1 !important;
+  letter-spacing:-0.045em !important;
+  font-weight:400 !important;
+}
+
+.fixed-menu-brand{
+  font-weight:800 !important;
+}
+
+/* Global simple type controls */
+:root{
+  --portfolio-font: Arial, Helvetica, sans-serif;
+  --portfolio-display: clamp(44px, 5.9vw, 86px);
+  --portfolio-section: clamp(58px, 9.5vw, 140px);
+  --portfolio-card-title: clamp(30px, 4vw, 60px);
+  --portfolio-body: 18px;
+  --portfolio-meta: 12px;
+}
+
+html,
+body,
+.ref3-site{
+  font-family:var(--portfolio-font) !important;
+  background:#d9d9d7 !important;
+  color:#050505 !important;
+}
+
+/* HERO: desktop */
+.ref3-hero{
+  position:relative !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+}
+
+.ref3-pink{
+  left:50% !important;
+  top:8vh !important;
+  width:min(48vw,720px) !important;
+  height:70vh !important;
+  min-height:590px !important;
+  z-index:30 !important;
+  transform:translateX(-42%) rotate(3deg) !important;
+}
+
+.ref3-pink h1{
+  position:relative !important;
+  z-index:5 !important;
+  font-size:var(--portfolio-display) !important;
+  line-height:.84 !important;
+  letter-spacing:-.09em !important;
+}
+
+.ref3-symbol{
+  left:15% !important;
+  right:13% !important;
+  bottom:18% !important;
+  height:34% !important;
+  border-width:12px !important;
+  z-index:2 !important;
+}
+.ref3-symbol::before,
+.ref3-symbol::after{border-width:12px !important;}
+.ref3-symbol span{border-width:9px !important;}
+
+.ref3-yellow{
+  left:7vw !important;
+  top:46vh !important;
+  width:min(34vw,430px) !important;
+  min-height:278px !important;
+  z-index:45 !important;
+  transform:rotate(-5deg) !important;
+}
+
+.ref3-white{
+  right:5vw !important;
+  top:15vh !important;
+  width:min(31vw,430px) !important;
+  min-height:56vh !important;
+  z-index:18 !important;
+  transform:rotate(-4deg) !important;
+}
+
+.ref3-black{
+  right:26vw !important;
+  top:35vh !important;
+  width:235px !important;
+  height:106px !important;
+  z-index:55 !important;
+  transform:rotate(-8deg) !important;
+}
+
+.ref3-red{
+  left:31vw !important;
+  top:39vh !important;
+  width:260px !important;
+  height:410px !important;
+  z-index:10 !important;
+  transform:rotate(4deg) !important;
+}
+
+/* Cards and typography */
+.ref3-work,
+.ref3-services{
+  position:relative !important;
+  padding-top:70px !important;
+  padding-bottom:70px !important;
+  margin-top:-70px !important;
+}
+
+.ref3-work-heading h2{
+  font-size:var(--portfolio-section) !important;
+}
+
+.ref3-project h3,
+.ref3-service h3{
+  font-size:var(--portfolio-card-title) !important;
+  line-height:.84 !important;
+  letter-spacing:-.08em !important;
+}
+
+.ref3-project p,
+.ref3-service p{
+  font-size:var(--portfolio-body) !important;
+  line-height:1.05 !important;
+}
+
+/* MOBILE: keep all hero cards in one compact composition */
+@media(max-width:900px){
+  .fixed-menu-header{
+    top:122px !important;
+  }
+
+  .fixed-menu-footer{
+    bottom:118px !important;
+  }
+
+  .fixed-menu-inner{
+    padding:0 34px !important;
+  }
+
+  .fixed-menu-link{
+    font-size:17px !important;
+    letter-spacing:-.045em !important;
+  }
+
+  .ref3-hero{
+    min-height:930px !important;
+  }
+
+  .ref3-pink{
+    top:142px !important;
+    left:50% !important;
+    width:74vw !important;
+    height:515px !important;
+    min-height:515px !important;
+    z-index:30 !important;
+    transform:translateX(-42%) rotate(3deg) !important;
+  }
+
+  .ref3-mini-nav{
+    font-size:10px !important;
+  }
+
+  .ref3-pink h1{
+    font-size:39px !important;
+    line-height:.84 !important;
+  }
+
+  .ref3-symbol{
+    left:16% !important;
+    right:12% !important;
+    bottom:88px !important;
+    height:27% !important;
+    border-width:8px !important;
+  }
+
+  .ref3-symbol::before,
+  .ref3-symbol::after{
+    border-width:8px !important;
+  }
+
+  .ref3-symbol span{
+    border-width:6px !important;
+  }
+
+  .ref3-card-footer{
+    left:18px !important;
+    right:18px !important;
+    bottom:18px !important;
+  }
+
+  .ref3-card-footer strong{
+    font-size:38px !important;
+  }
+
+  .ref3-yellow{
+    left:5vw !important;
+    top:490px !important;
+    width:56vw !important;
+    min-height:232px !important;
+    padding:18px !important;
+    z-index:50 !important;
+    transform:rotate(-5deg) !important;
+  }
+
+  .ref3-count{
+    font-size:52px !important;
+  }
+
+  .ref3-yellow h2{
+    margin-top:34px !important;
+    font-size:33px !important;
+  }
+
+  .ref3-yellow p{
+    font-size:15px !important;
+  }
+
+  .ref3-bottle{
+    width:48px !important;
+    height:78px !important;
+    top:32px !important;
+    right:20px !important;
+  }
+
+  .ref3-bottle::before,
+  .ref3-bottle::after{
+    left:-10px !important;
+    right:-10px !important;
+  }
+
+  .ref3-white{
+    right:-8vw !important;
+    top:250px !important;
+    width:57vw !important;
+    min-height:390px !important;
+    padding:20px 16px !important;
+    z-index:18 !important;
+    transform:rotate(-4deg) !important;
+  }
+
+  .ref3-profile-dot{
+    width:72px !important;
+    height:72px !important;
+    margin:30px auto 12px !important;
+  }
+
+  .ref3-level{
+    width:72px !important;
+    height:72px !important;
+    margin-bottom:10px !important;
+  }
+
+  .ref3-level span{
+    font-size:32px !important;
+  }
+
+  .ref3-done{
+    font-size:36px !important;
+  }
+
+  .ref3-white li{
+    font-size:22px !important;
+    gap:8px !important;
+    padding:7px 0 !important;
+  }
+
+  .ref3-white b{
+    width:24px !important;
+    height:24px !important;
+    flex-basis:24px !important;
+    font-size:12px !important;
+  }
+
+  .ref3-black{
+    right:8vw !important;
+    top:468px !important;
+    width:150px !important;
+    height:78px !important;
+    padding:14px !important;
+    z-index:60 !important;
+    transform:rotate(-8deg) !important;
+  }
+
+  .ref3-black span{
+    font-size:20px !important;
+  }
+
+  .ref3-black strong{
+    font-size:22px !important;
+  }
+
+  .ref3-red{
+    left:43vw !important;
+    top:420px !important;
+    width:128px !important;
+    height:320px !important;
+    z-index:8 !important;
+    transform:rotate(4deg) !important;
+  }
+
+  .ref3-work{
+    margin-top:-80px !important;
+    padding-top:42px !important;
+  }
+
+  .ref3-services{
+    margin-top:-130px !important;
+    padding-top:34px !important;
+  }
+
+  .ref3-work-stage{
+    min-height:1120px !important;
+  }
+
+  .ref3-project{
+    width:76vw !important;
+    min-height:245px !important;
+    padding:20px !important;
+  }
+
+  .ref3-project-1{left:4vw !important; top:15px !important;}
+  .ref3-project-2{right:3vw !important; top:225px !important;}
+  .ref3-project-3{left:16vw !important; top:440px !important;}
+  .ref3-project-4{right:4vw !important; top:655px !important;}
+  .ref3-project-5{left:5vw !important; top:865px !important;}
+
+  .ref3-service-stage{
+    min-height:900px !important;
+  }
+
+  .ref3-service{
+    width:76vw !important;
+    min-height:240px !important;
+    padding:20px !important;
+  }
+
+  .ref3-service-yellow{left:4vw !important; top:0 !important;}
+  .ref3-service-pink{left:18vw !important; top:200px !important;}
+  .ref3-service-black{right:4vw !important; top:400px !important;}
+  .ref3-service-white{left:6vw !important; top:600px !important;}
+}

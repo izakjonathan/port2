@@ -1,10 +1,12 @@
 # Portfolio Card References
 
+These references are for communication only. They are not displayed on the live site.
+
 ## Fixed menu
-- H1 — Identity: top-left `IZAK HYLLESTED`
-- H2 — About: top-right `ABOUT`
-- F1 — Contact: bottom-left `CONTACT`
-- F2 — Projects: bottom-right `PROJECTS`
+- H1 — Identity: `IZAK HYLLESTED`
+- H2 — About: `ABOUT`
+- F1 — Contact: `CONTACT`
+- F2 — Projects: `PROJECTS`
 
 ## Hero composition
 - C1 — Main Pink Card
@@ -25,22 +27,3 @@
 - S2 — Web Design Card
 - S3 — Development Card
 - S4 — Editorial Card
-
-## Background layers
-- B1 — WORK typography
-- B2 — SERVICES typography
-
-## Typography controls
-
-Edit `app/globals.css`, near the bottom:
-
-```css
-:root{
-  --type-menu
-  --type-display
-  --type-section
-  --type-card-title
-  --type-card-body
-  --type-meta
-}
-```
