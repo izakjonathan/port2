@@ -29,14 +29,7 @@ export default function Home() {
   return (
     <main className="ref3-site">
       <section className="ref3-hero">
-        <div className="ref3-corner ref3-corner-tl">Portfolio <span>Studio</span></div>
-        <Link href="/projects" className="ref3-corner ref3-corner-tr">Main Page</Link>
-        <a href="#case-studies" className="ref3-corner ref3-corner-bl">Selected Work</a>
-        <a href="#about" className="ref3-corner ref3-corner-br">Design <span>Development</span></a>
-
-        <div className="ref3-card ref3-red" aria-hidden="true" />
-
-        <article className="ref3-card ref3-pink">
+<article className="ref3-card ref3-pink">
           <div className="ref3-mini-nav">
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
@@ -44,26 +37,13 @@ export default function Home() {
           </div>
 
           <h1><span>Turning Ideas</span> Into Visual Systems And Digital Products.</h1>
-
-          <div className="ref3-symbol" aria-hidden="true">
-            <span />
-          </div>
-
-          <footer className="ref3-card-footer">
-            <span><strong>05</strong> / Projects</span>
-            <i />
-            <i />
-            <i />
-          </footer>
-        </article>
+</article>
 
         <article className="ref3-card ref3-yellow">
           <div className="ref3-count">12 <span>/12</span></div>
           <h2>Strategy<br /><span>Session</span></h2>
           <p>Graphic design, logos, layouts and creative direction.</p>
-          <div className="ref3-bottle" aria-hidden="true" />
-          <div className="ref3-dot-pair"><b>2</b><b>T</b></div>
-        </article>
+</article>
 
         <article className="ref3-card ref3-white">
           <div className="ref3-menu-dots">•••</div>
@@ -79,12 +59,7 @@ export default function Home() {
             <li><b>E</b>Elite</li>
           </ul>
         </article>
-
-        <Link href="/projects" className="ref3-card ref3-black">
-          <span>Case<br />Studies</span>
-          <strong>{projects.length}</strong>
-        </Link>
-      </section>
+</section>
 
       <section className="ref3-work" id="case-studies">
         <div className="ref3-bg-word">WORK</div>

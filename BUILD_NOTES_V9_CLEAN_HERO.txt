@@ -1,0 +1,1 @@
+Removed illustrations from pink/yellow cards, removed black case-study card and orange depth card, removed old top corner/reference text from JSX, and tightened fixed menu placement.

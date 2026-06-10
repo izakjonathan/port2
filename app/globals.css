@@ -932,3 +932,163 @@ select{
     padding:80px 16px 150px;
   }
 }
+
+
+/* =====================================================
+   V9 CLEAN HERO FINAL OVERRIDES
+   ===================================================== */
+
+/* Remove leftover old/reference text and decorative elements */
+.ref3-corner,
+.audio-label,
+.corner-label,
+.ref3-red,
+.ref3-black,
+.ref3-symbol,
+.ref3-card-footer,
+.ref3-bottle,
+.ref3-dot-pair{
+  display:none !important;
+}
+
+/* Fixed menu final placement */
+.fixed-menu{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:999999 !important;
+  pointer-events:none !important;
+  display:block !important;
+  mix-blend-mode:normal !important;
+}
+
+.fixed-menu-header{
+  top:calc(env(safe-area-inset-top, 0px) + 10px) !important;
+}
+
+.fixed-menu-footer{
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 10px) !important;
+}
+
+.fixed-menu-inner{
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  padding:0 34px !important;
+}
+
+.fixed-menu-link{
+  pointer-events:auto !important;
+  color:#151515 !important;
+  font-size:17px !important;
+  line-height:1 !important;
+  letter-spacing:-.045em !important;
+  text-decoration:none !important;
+  font-weight:400 !important;
+}
+
+.fixed-menu-brand{
+  font-weight:800 !important;
+}
+
+/* Hero has only C1 pink, C2 yellow and C3 white */
+.ref3-hero{
+  min-height:100svh !important;
+}
+
+.ref3-pink{
+  top:112px !important;
+  height:auto !important;
+  min-height:510px !important;
+  padding-bottom:42px !important;
+}
+
+.ref3-pink h1{
+  margin-top:42px !important;
+  max-width:680px !important;
+}
+
+.ref3-yellow{
+  top:51vh !important;
+  min-height:255px !important;
+}
+
+.ref3-yellow h2{
+  margin-top:56px !important;
+}
+
+.ref3-yellow p{
+  max-width:320px !important;
+}
+
+.ref3-white{
+  top:18vh !important;
+  right:4vw !important;
+}
+
+/* remove accidental old labels if still rendered by other class names */
+[class*="corner"],
+[class*="audio-label"]{
+  display:none !important;
+}
+
+@media(max-width:900px){
+  .fixed-menu-header{
+    top:calc(env(safe-area-inset-top, 0px) + 10px) !important;
+  }
+
+  .fixed-menu-footer{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 10px) !important;
+  }
+
+  .fixed-menu-link{
+    font-size:16px !important;
+  }
+
+  .ref3-hero{
+    min-height:850px !important;
+  }
+
+  .ref3-pink{
+    top:112px !important;
+    left:50% !important;
+    width:74vw !important;
+    height:auto !important;
+    min-height:455px !important;
+    padding:18px 18px 34px !important;
+    transform:translateX(-42%) rotate(3deg) !important;
+  }
+
+  .ref3-pink h1{
+    margin-top:42px !important;
+    font-size:42px !important;
+    line-height:.84 !important;
+  }
+
+  .ref3-yellow{
+    left:5vw !important;
+    top:525px !important;
+    width:56vw !important;
+    min-height:225px !important;
+    padding:18px !important;
+    z-index:50 !important;
+  }
+
+  .ref3-yellow h2{
+    margin-top:48px !important;
+    font-size:34px !important;
+  }
+
+  .ref3-yellow p{
+    font-size:15px !important;
+  }
+
+  .ref3-white{
+    right:-12vw !important;
+    top:230px !important;
+    width:58vw !important;
+    min-height:370px !important;
+    z-index:14 !important;
+  }
+}
