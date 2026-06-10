@@ -1,0 +1,1 @@
+Full homepage redesigned in a light grey overlapping-card style inspired by the supplied Audio Lessons reference. Rewrites app/page.js and Nav.js; appends CSS to app/globals.css.
