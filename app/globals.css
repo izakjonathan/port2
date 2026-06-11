@@ -1001,131 +1001,55 @@ select {
 
 
 
+
+
 /* =====================================================
-   V16 HARD ANIMATION BUILD
-   This targets the ACTUAL active classes:
-   .hero-card-main, .hero-card-strategy, .hero-card-profile,
-   .project-card, .service-card, .home-hero, .work-section,
-   .services-section, .about-section.
+   V17 CENTERED MOBILE ANIMATION FIX
+   Hard fix: animation no longer replaces positioning transforms.
+   Actual mobile classes are centered with explicit left/right/width rules.
+   Tap 1 brings forward, tap 2 opens.
    ===================================================== */
 
 :root{
-  --motion-speed:520ms;
+  --motion-speed:430ms;
   --motion-ease:cubic-bezier(.16,1,.3,1);
 }
 
-/* Visible animated light field */
-body::before{
-  content:"";
-  position:fixed;
-  inset:-25%;
-  z-index:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at calc(50% + var(--pointer-x,0) * 18%) calc(40% + var(--pointer-y,0) * 14%), rgba(255,255,255,.35), transparent 26%),
-    radial-gradient(circle at 18% 25%, rgba(255,135,201,.22), transparent 28%),
-    radial-gradient(circle at 85% 70%, rgba(255,229,80,.2), transparent 30%);
-  filter:blur(14px);
-  opacity:.9;
-  animation:bgBreath 8s ease-in-out infinite alternate;
-  transform:translate3d(calc(var(--pointer-x,0) * -24px), calc(var(--pointer-y,0) * -24px), 0);
+/* Keep menu fixed and readable */
+.fixed-menu{
+  z-index:10000 !important;
 }
 
-.site-home{
-  position:relative;
-  z-index:1;
+.fixed-menu-inner{
+  padding-left:22px !important;
+  padding-right:22px !important;
 }
 
-/* Actual animated cards */
+/* Motion should affect z-index/shadow/scale only by default, not page positioning */
 .motion-card{
   z-index:var(--card-z,1) !important;
   cursor:pointer;
   touch-action:manipulation;
-  transform:
-    translate3d(var(--px,0px), calc(var(--py,0px) + var(--float-y,0px)), 0)
-    rotateX(var(--tilt-x,0deg))
-    rotateY(var(--tilt-y,0deg))
-    rotate(var(--r,0deg))
-    scale(var(--card-scale,1)) !important;
   transition:
     transform var(--motion-speed) var(--motion-ease),
     box-shadow var(--motion-speed) var(--motion-ease),
     filter var(--motion-speed) var(--motion-ease),
     opacity var(--motion-speed) var(--motion-ease);
-  will-change:transform, box-shadow, filter;
-  transform-style:preserve-3d;
-}
-
-.motion-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  pointer-events:none;
-  background:linear-gradient(120deg, rgba(255,255,255,.28), transparent 34%, rgba(0,0,0,.08));
-  opacity:.28;
-  animation:cardGlint 4.8s ease-in-out infinite;
+  will-change:transform;
 }
 
 .motion-card.is-card-front{
-  --card-scale:1.045;
-  box-shadow:0 56px 145px rgba(0,0,0,.32) !important;
-  filter:saturate(1.12) contrast(1.03);
+  box-shadow:0 42px 115px rgba(0,0,0,.28) !important;
+  filter:saturate(1.08) contrast(1.02);
 }
 
-.motion-card:active{
-  --card-scale:.985;
-}
-
-/* Obvious constant floating on the real hero cards */
-.hero-card-main{
-  animation:floatMain 3.8s ease-in-out infinite;
-}
-
-.hero-card-strategy{
-  animation:floatStrategy 3.2s ease-in-out infinite;
-}
-
-.hero-card-profile{
-  animation:floatProfile 4.4s ease-in-out infinite;
-}
-
-.project-card,
-.service-card{
-  animation:floatSmall 5.4s ease-in-out infinite;
-  animation-delay:calc(var(--card-z,1) * -45ms);
-}
-
-/* Scroll/section/reactive movement on real section elements */
-.background-word{
-  animation:wordDrift 9s ease-in-out infinite alternate;
-  transform:translate3d(calc(var(--pointer-x,0) * -34px), calc(var(--section-progress,0) * -48px), 0);
-}
-
-.section-heading{
-  animation:headingSlide 900ms var(--motion-ease) both;
-}
-
-.home-hero{
-  perspective:1200px;
-}
-
-.work-section,
-.services-section,
-.about-section{
-  transform:translate3d(0, calc((1 - var(--section-progress,0)) * 22px), 0);
-  transition:transform 400ms var(--motion-ease);
-}
-
-/* Reveal system */
+/* Entrance/reveal animation that does not permanently override card placement */
 [data-reveal-motion]{
   opacity:0;
-  filter:blur(10px);
-  transform:translate3d(0,34px,0) scale(.97);
 }
 
 .motion-ready [data-reveal-motion]{
-  animation:revealUp 850ms var(--motion-ease) forwards;
+  animation:revealFadeIn 620ms var(--motion-ease) forwards;
   animation-delay:var(--reveal-delay, var(--stagger, 0ms));
 }
 
@@ -1133,103 +1057,111 @@ body::before{
   opacity:1;
 }
 
-/* Menu entrance only; no parallax */
-.fixed-menu{
-  animation:menuAppear 650ms var(--motion-ease) both;
+/* Desktop: preserve original rotations and add only subtle vertical lift */
+.hero-card-main.motion-card{
+  transform:translate3d(0, var(--motion-lift,0px), 0) rotate(3deg) scale(var(--card-scale,1)) !important;
+  animation:heroFloatMain 4.4s ease-in-out infinite;
 }
 
-.fixed-menu-footer{
-  animation-name:menuAppearBottom;
+.hero-card-strategy.motion-card{
+  transform:translate3d(0, var(--motion-lift,0px), 0) rotate(-5deg) scale(var(--card-scale,1)) !important;
+  animation:heroFloatStrategy 4s ease-in-out infinite;
 }
 
-.fixed-menu,
-.fixed-menu *{
-  transform:none !important;
+.hero-card-profile.motion-card{
+  transform:translate3d(0, var(--motion-lift,0px), 0) rotate(-4deg) scale(var(--card-scale,1)) !important;
+  animation:heroFloatProfile 5.2s ease-in-out infinite;
 }
 
-/* Keyframes */
-@keyframes bgBreath{
-  from{opacity:.62; transform:translate3d(calc(var(--pointer-x,0) * -18px), calc(var(--pointer-y,0) * -18px), 0) scale(1)}
-  to{opacity:.95; transform:translate3d(calc(var(--pointer-x,0) * -30px), calc(var(--pointer-y,0) * -30px), 0) scale(1.08)}
+.hero-card.motion-card.is-card-front{
+  --card-scale:1.035;
 }
 
-@keyframes cardGlint{
-  0%,100%{opacity:.12}
-  50%{opacity:.42}
+/* Mobile centering: explicit hard positions for active hero cards */
+@media(max-width:900px){
+  .fixed-menu-inner{
+    padding-left:22px !important;
+    padding-right:22px !important;
+  }
+
+  .home-hero{
+    overflow:hidden !important;
+  }
+
+  .hero-card-main.motion-card{
+    left:50% !important;
+    right:auto !important;
+    width:min(76vw, 320px) !important;
+    transform:
+      translateX(-50%)
+      translate3d(0, var(--motion-lift,0px), 0)
+      rotate(3deg)
+      scale(var(--card-scale,1)) !important;
+    transform-origin:center center !important;
+  }
+
+  .hero-card-strategy.motion-card{
+    left:50% !important;
+    right:auto !important;
+    width:min(58vw, 250px) !important;
+    transform:
+      translateX(-84%)
+      translate3d(0, var(--motion-lift,0px), 0)
+      rotate(-5deg)
+      scale(var(--card-scale,1)) !important;
+    transform-origin:center center !important;
+  }
+
+  .hero-card-profile.motion-card{
+    left:50% !important;
+    right:auto !important;
+    width:min(58vw, 250px) !important;
+    transform:
+      translateX(8%)
+      translate3d(0, var(--motion-lift,0px), 0)
+      rotate(-4deg)
+      scale(var(--card-scale,1)) !important;
+    transform-origin:center center !important;
+  }
+
+  .hero-card.motion-card.is-card-front{
+    --card-scale:1.025;
+  }
 }
 
-@keyframes floatMain{
-  0%,100%{--float-y:0px}
-  50%{--float-y:-22px}
+/* Project/service cards: keep them within the viewport on mobile */
+@media(max-width:900px){
+  .project-card.motion-card,
+  .service-card.motion-card{
+    max-width:86vw !important;
+    transform:translate3d(0, var(--motion-lift,0px), 0) rotate(var(--card-rotate, 0deg)) scale(var(--card-scale,1)) !important;
+  }
 }
 
-@keyframes floatStrategy{
-  0%,100%{--float-y:0px}
-  50%{--float-y:24px}
-}
-
-@keyframes floatProfile{
-  0%,100%{--float-y:0px}
-  50%{--float-y:-16px}
-}
-
-@keyframes floatSmall{
-  0%,100%{--float-y:0px}
-  50%{--float-y:-12px}
-}
-
-@keyframes wordDrift{
-  from{letter-spacing:-.14em; opacity:.34}
-  to{letter-spacing:-.08em; opacity:.52}
-}
-
-@keyframes headingSlide{
-  from{opacity:0; transform:translateY(18px)}
-  to{opacity:1; transform:translateY(0)}
-}
-
-@keyframes revealUp{
+@keyframes revealFadeIn{
+  from{
+    opacity:0;
+    filter:blur(8px);
+  }
   to{
     opacity:1;
     filter:blur(0);
-    transform:translate3d(0,0,0) scale(1);
   }
 }
 
-@keyframes menuAppear{
-  from{opacity:0; transform:translateY(-14px)}
-  to{opacity:1; transform:translateY(0)}
+@keyframes heroFloatMain{
+  0%,100%{margin-top:0}
+  50%{margin-top:-10px}
 }
 
-@keyframes menuAppearBottom{
-  from{opacity:0; transform:translateY(14px)}
-  to{opacity:1; transform:translateY(0)}
+@keyframes heroFloatStrategy{
+  0%,100%{margin-top:0}
+  50%{margin-top:9px}
 }
 
-@media(max-width:900px){
-  :root{
-    --motion-speed:390ms;
-  }
-
-  .motion-card.is-card-front{
-    --card-scale:1.03;
-  }
-
-  .hero-card-main{
-    animation-duration:3.1s;
-  }
-
-  .hero-card-strategy{
-    animation-duration:2.8s;
-  }
-
-  .hero-card-profile{
-    animation-duration:3.6s;
-  }
-
-  body::before{
-    opacity:.75;
-  }
+@keyframes heroFloatProfile{
+  0%,100%{margin-top:0}
+  50%{margin-top:-7px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -1238,9 +1170,5 @@ body::before{
   *::after{
     animation:none !important;
     transition:none !important;
-  }
-
-  .motion-card{
-    transform:rotate(var(--r,0deg)) !important;
   }
 }

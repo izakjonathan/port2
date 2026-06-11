@@ -11,12 +11,9 @@ export default function Home() {
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
     const revealItems = Array.from(document.querySelectorAll("[data-reveal-motion]"));
-    const motionSections = Array.from(document.querySelectorAll("[data-motion-section]"));
 
     let raf = 0;
     let scrollY = window.scrollY;
-    let pointerX = window.innerWidth / 2;
-    let pointerY = window.innerHeight / 2;
 
     const bringToFront = (card) => {
       cards.forEach((item, index) => {
@@ -31,39 +28,17 @@ export default function Home() {
 
     const update = () => {
       raf = 0;
-
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      const moveX = (pointerX - centerX) / centerX;
-      const moveY = (pointerY - centerY) / centerY;
-
-      document.documentElement.style.setProperty("--pointer-x", moveX.toFixed(4));
-      document.documentElement.style.setProperty("--pointer-y", moveY.toFixed(4));
       document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
 
       cards.forEach((card) => {
-        const rect = card.getBoundingClientRect();
         const depth = Number(card.dataset.depth || 0);
-        const rotate = Number(card.dataset.rotate || 0);
-        const localX = (pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1);
-        const localY = (pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1);
-        const scrollOffset = scrollY * depth * -0.07;
-        const x = moveX * depth * 34;
-        const y = scrollOffset + moveY * depth * 22;
-        const tiltX = localY * depth * -9;
-        const tiltY = localX * depth * 11;
+        const rect = card.getBoundingClientRect();
+        const viewportCenter = window.innerHeight / 2;
+        const cardCenter = rect.top + rect.height / 2;
+        const distance = (cardCenter - viewportCenter) / window.innerHeight;
+        const lift = Math.max(-18, Math.min(18, distance * depth * -28));
 
-        card.style.setProperty("--px", `${x.toFixed(2)}px`);
-        card.style.setProperty("--py", `${y.toFixed(2)}px`);
-        card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
-        card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
-        card.style.setProperty("--r", `${rotate}deg`);
-      });
-
-      motionSections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const progress = Math.min(1, Math.max(0, 1 - rect.top / window.innerHeight));
-        section.style.setProperty("--section-progress", progress.toFixed(3));
+        card.style.setProperty("--motion-lift", `${lift.toFixed(2)}px`);
       });
     };
 
@@ -74,7 +49,7 @@ export default function Home() {
     cards.forEach((card, index) => {
       const baseZ = Number(card.dataset.baseZ || index + 1);
       card.style.setProperty("--card-z", String(baseZ));
-      card.style.setProperty("--stagger", `${index * 90}ms`);
+      card.style.setProperty("--stagger", `${index * 75}ms`);
 
       card.addEventListener("click", (event) => {
         if (activeCardRef.current !== card) {
@@ -96,7 +71,7 @@ export default function Home() {
     }, { threshold: 0.08, rootMargin: "0px 0px -4% 0px" });
 
     revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${index * 65}ms`);
+      item.style.setProperty("--reveal-delay", `${index * 55}ms`);
       observer.observe(item);
     });
 
@@ -105,23 +80,7 @@ export default function Home() {
       requestUpdate();
     };
 
-    const onPointerMove = (event) => {
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      requestUpdate();
-    };
-
-    const onOrientation = (event) => {
-      if (typeof event.gamma === "number") {
-        pointerX = window.innerWidth / 2 + event.gamma * 15;
-        pointerY = window.innerHeight / 2 + (event.beta || 0) * 8;
-        requestUpdate();
-      }
-    };
-
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("deviceorientation", onOrientation, { passive: true });
 
     requestAnimationFrame(() => {
       document.body.classList.add("motion-ready");
@@ -130,8 +89,6 @@ export default function Home() {
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("deviceorientation", onOrientation);
       observer.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
@@ -140,10 +97,11 @@ export default function Home() {
 
 
 
+
   return (
     <main className="site-home">
       <section className="home-hero" data-motion-section aria-label="Portfolio introduction">
-        <article className="hero-card hero-card-main motion-card" data-card-layer data-base-z="30" data-depth="1.15" data-rotate="3" data-reveal-motion>
+        <article className="hero-card hero-card-main motion-card">
           <div className="hero-card-meta" data-reveal-motion>
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
@@ -156,7 +114,7 @@ export default function Home() {
           </h1>
         </article>
 
-        <article className="hero-card hero-card-strategy motion-card" data-card-layer data-base-z="65" data-depth="1.8" data-rotate="-5" data-reveal-motion>
+        <article className="hero-card hero-card-strategy motion-card">
           <div className="strategy-count">
             12 <span>/12</span>
           </div>
@@ -168,7 +126,7 @@ export default function Home() {
           <p>Graphic design, logos, layouts and creative direction.</p>
         </article>
 
-        <article className="hero-card hero-card-profile motion-card" data-card-layer data-base-z="20" data-depth="0.85" data-rotate="-4" data-reveal-motion>
+        <article className="hero-card hero-card-profile motion-card">
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
