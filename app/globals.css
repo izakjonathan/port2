@@ -993,3 +993,61 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =====================================================
+   V13 MOTION SYSTEM
+   Parallax + tap/press-to-front card interaction.
+   ===================================================== */
+
+:root{
+  --motion-speed:520ms;
+  --motion-ease:cubic-bezier(.16,1,.3,1);
+}
+
+.motion-card{
+  z-index:var(--card-z,1) !important;
+  cursor:pointer;
+  touch-action:manipulation;
+  transform:
+    translate3d(var(--px,0px), var(--py,0px), 0)
+    rotate(var(--r,0deg))
+    scale(var(--card-scale,1)) !important;
+  transition:
+    transform var(--motion-speed) var(--motion-ease),
+    box-shadow var(--motion-speed) var(--motion-ease),
+    filter var(--motion-speed) var(--motion-ease);
+  will-change:transform;
+}
+
+.motion-card.is-card-front{
+  --card-scale:1.035;
+  box-shadow:0 42px 110px rgba(0,0,0,.22) !important;
+  filter:saturate(1.04);
+}
+
+.motion-card:active{
+  --card-scale:.985;
+}
+
+.fixed-menu,
+.fixed-menu *{
+  transform:none !important;
+}
+
+@media(max-width:900px){
+  :root{
+    --motion-speed:420ms;
+  }
+
+  .motion-card.is-card-front{
+    --card-scale:1.025;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .motion-card{
+    transition:none !important;
+    transform:rotate(var(--r,0deg)) !important;
+  }
+}

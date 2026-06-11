@@ -1,7 +1,76 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
 import { projects } from "../data/projects";
 
 export default function Home() {
+
+  useEffect(() => {
+    const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
+    if (!cards.length) return;
+
+    let raf = 0;
+    let scrollY = window.scrollY;
+    let pointerX = window.innerWidth / 2;
+    let pointerY = window.innerHeight / 2;
+
+    function update() {
+      raf = 0;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const mx = (pointerX - cx) / cx;
+      const my = (pointerY - cy) / cy;
+
+      cards.forEach((card) => {
+        const depth = Number(card.dataset.depth || 0);
+        const rotate = Number(card.dataset.rotate || 0);
+        const x = mx * depth * 10;
+        const y = scrollY * depth * -0.045 + my * depth * 8;
+
+        card.style.setProperty("--px", `${x.toFixed(2)}px`);
+        card.style.setProperty("--py", `${y.toFixed(2)}px`);
+        card.style.setProperty("--r", `${rotate}deg`);
+      });
+    }
+
+    function requestUpdate() {
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+
+    cards.forEach((card, index) => {
+      const baseZ = Number(card.dataset.baseZ || index + 1);
+      card.style.setProperty("--card-z", String(baseZ));
+
+      card.addEventListener("pointerdown", () => {
+        cards.forEach((item, itemIndex) => {
+          item.classList.remove("is-card-front");
+          item.style.setProperty("--card-z", String(Number(item.dataset.baseZ || itemIndex + 1)));
+        });
+
+        card.classList.add("is-card-front");
+        card.style.setProperty("--card-z", "300");
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      scrollY = window.scrollY;
+      requestUpdate();
+    }, { passive: true });
+
+    window.addEventListener("pointermove", (event) => {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      requestUpdate();
+    }, { passive: true });
+
+    update();
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <main className="site-home">
       <section className="home-hero" aria-label="Portfolio introduction">
@@ -64,7 +133,7 @@ export default function Home() {
           {projects.map((project, index) => (
             <Link
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1}`}
+              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={20 + index} data-depth={0.35 + index * 0.12} data-rotate={index % 2 ? 2 : -2}
               key={project.slug}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
