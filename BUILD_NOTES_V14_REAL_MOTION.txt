@@ -1,0 +1,1 @@
+Cards now use real data-card-layer attributes. Parallax runs on scroll/pointer/device orientation. First tap brings card to front; second tap opens links.

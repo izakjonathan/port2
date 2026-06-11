@@ -1,75 +1,141 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { projects } from "../data/projects";
 
 export default function Home() {
 
+  const activeCardRef = useRef(null);
+
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
-    if (!cards.length) return;
+    const revealItems = Array.from(document.querySelectorAll("[data-reveal-motion]"));
+    const sections = Array.from(document.querySelectorAll("[data-motion-section]"));
 
     let raf = 0;
     let scrollY = window.scrollY;
     let pointerX = window.innerWidth / 2;
     let pointerY = window.innerHeight / 2;
 
-    function update() {
+    const bringToFront = (card) => {
+      cards.forEach((item, index) => {
+        item.classList.remove("is-card-front");
+        item.style.setProperty("--card-z", String(Number(item.dataset.baseZ || index + 1)));
+      });
+      card.classList.add("is-card-front");
+      card.style.setProperty("--card-z", "700");
+      activeCardRef.current = card;
+    };
+
+    const update = () => {
       raf = 0;
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const mx = (pointerX - cx) / cx;
-      const my = (pointerY - cy) / cy;
+
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const moveX = (pointerX - centerX) / centerX;
+      const moveY = (pointerY - centerY) / centerY;
+
+      document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
+      document.documentElement.style.setProperty("--pointer-x", moveX.toFixed(4));
+      document.documentElement.style.setProperty("--pointer-y", moveY.toFixed(4));
 
       cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
         const depth = Number(card.dataset.depth || 0);
         const rotate = Number(card.dataset.rotate || 0);
-        const x = mx * depth * 10;
-        const y = scrollY * depth * -0.045 + my * depth * 8;
+        const localX = ((pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1));
+        const localY = ((pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1));
+        const scrollMove = scrollY * depth * -0.035;
+        const x = moveX * depth * 18;
+        const y = scrollMove + moveY * depth * 12;
+        const tiltX = localY * depth * -4;
+        const tiltY = localX * depth * 5;
 
         card.style.setProperty("--px", `${x.toFixed(2)}px`);
         card.style.setProperty("--py", `${y.toFixed(2)}px`);
         card.style.setProperty("--r", `${rotate}deg`);
+        card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
+        card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
       });
-    }
 
-    function requestUpdate() {
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        const progress = Math.min(1, Math.max(0, 1 - rect.top / window.innerHeight));
+        section.style.setProperty("--section-progress", progress.toFixed(3));
+      });
+    };
+
+    const requestUpdate = () => {
       if (!raf) raf = requestAnimationFrame(update);
-    }
+    };
 
     cards.forEach((card, index) => {
-      const baseZ = Number(card.dataset.baseZ || index + 1);
-      card.style.setProperty("--card-z", String(baseZ));
+      card.style.setProperty("--card-z", String(Number(card.dataset.baseZ || index + 1)));
+      card.style.setProperty("--stagger", `${index * 80}ms`);
+
+      card.addEventListener("click", (event) => {
+        if (activeCardRef.current !== card) {
+          event.preventDefault();
+          event.stopPropagation();
+          bringToFront(card);
+        }
+      }, true);
 
       card.addEventListener("pointerdown", () => {
-        cards.forEach((item, itemIndex) => {
-          item.classList.remove("is-card-front");
-          item.style.setProperty("--card-z", String(Number(item.dataset.baseZ || itemIndex + 1)));
-        });
-
-        card.classList.add("is-card-front");
-        card.style.setProperty("--card-z", "300");
+        if (activeCardRef.current !== card) bringToFront(card);
       });
     });
 
-    window.addEventListener("scroll", () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("is-revealed");
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    revealItems.forEach((item, index) => {
+      item.style.setProperty("--reveal-delay", `${index * 55}ms`);
+      observer.observe(item);
+    });
+
+    const onScroll = () => {
       scrollY = window.scrollY;
       requestUpdate();
-    }, { passive: true });
+    };
 
-    window.addEventListener("pointermove", (event) => {
+    const onPointerMove = (event) => {
       pointerX = event.clientX;
       pointerY = event.clientY;
       requestUpdate();
-    }, { passive: true });
+    };
 
-    update();
+    const onOrientation = (event) => {
+      if (typeof event.gamma === "number") {
+        pointerX = window.innerWidth / 2 + event.gamma * 10;
+        pointerY = window.innerHeight / 2 + (event.beta || 0) * 4;
+        requestUpdate();
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("deviceorientation", onOrientation, { passive: true });
+
+    requestAnimationFrame(() => {
+      document.body.classList.add("motion-ready");
+      update();
+    });
 
     return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("deviceorientation", onOrientation);
+      observer.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
+
+
 
   return (
     <main className="site-home">
