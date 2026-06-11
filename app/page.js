@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
     const revealItems = Array.from(document.querySelectorAll("[data-reveal-motion]"));
-    const sections = Array.from(document.querySelectorAll("[data-motion-section]"));
+    const motionSections = Array.from(document.querySelectorAll("[data-motion-section]"));
 
     let raf = 0;
     let scrollY = window.scrollY;
@@ -23,8 +23,9 @@ export default function Home() {
         item.classList.remove("is-card-front");
         item.style.setProperty("--card-z", String(Number(item.dataset.baseZ || index + 1)));
       });
+
       card.classList.add("is-card-front");
-      card.style.setProperty("--card-z", "700");
+      card.style.setProperty("--card-z", "900");
       activeCardRef.current = card;
     };
 
@@ -36,30 +37,30 @@ export default function Home() {
       const moveX = (pointerX - centerX) / centerX;
       const moveY = (pointerY - centerY) / centerY;
 
-      document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
       document.documentElement.style.setProperty("--pointer-x", moveX.toFixed(4));
       document.documentElement.style.setProperty("--pointer-y", moveY.toFixed(4));
+      document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
 
       cards.forEach((card) => {
         const rect = card.getBoundingClientRect();
         const depth = Number(card.dataset.depth || 0);
         const rotate = Number(card.dataset.rotate || 0);
-        const localX = ((pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1));
-        const localY = ((pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1));
-        const scrollMove = scrollY * depth * -0.035;
-        const x = moveX * depth * 18;
-        const y = scrollMove + moveY * depth * 12;
-        const tiltX = localY * depth * -4;
-        const tiltY = localX * depth * 5;
+        const localX = (pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1);
+        const localY = (pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1);
+        const scrollOffset = scrollY * depth * -0.07;
+        const x = moveX * depth * 34;
+        const y = scrollOffset + moveY * depth * 22;
+        const tiltX = localY * depth * -9;
+        const tiltY = localX * depth * 11;
 
         card.style.setProperty("--px", `${x.toFixed(2)}px`);
         card.style.setProperty("--py", `${y.toFixed(2)}px`);
-        card.style.setProperty("--r", `${rotate}deg`);
         card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
         card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
+        card.style.setProperty("--r", `${rotate}deg`);
       });
 
-      sections.forEach((section) => {
+      motionSections.forEach((section) => {
         const rect = section.getBoundingClientRect();
         const progress = Math.min(1, Math.max(0, 1 - rect.top / window.innerHeight));
         section.style.setProperty("--section-progress", progress.toFixed(3));
@@ -71,8 +72,9 @@ export default function Home() {
     };
 
     cards.forEach((card, index) => {
-      card.style.setProperty("--card-z", String(Number(card.dataset.baseZ || index + 1)));
-      card.style.setProperty("--stagger", `${index * 80}ms`);
+      const baseZ = Number(card.dataset.baseZ || index + 1);
+      card.style.setProperty("--card-z", String(baseZ));
+      card.style.setProperty("--stagger", `${index * 90}ms`);
 
       card.addEventListener("click", (event) => {
         if (activeCardRef.current !== card) {
@@ -91,10 +93,10 @@ export default function Home() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) entry.target.classList.add("is-revealed");
       });
-    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    }, { threshold: 0.08, rootMargin: "0px 0px -4% 0px" });
 
     revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${index * 55}ms`);
+      item.style.setProperty("--reveal-delay", `${index * 65}ms`);
       observer.observe(item);
     });
 
@@ -111,8 +113,8 @@ export default function Home() {
 
     const onOrientation = (event) => {
       if (typeof event.gamma === "number") {
-        pointerX = window.innerWidth / 2 + event.gamma * 10;
-        pointerY = window.innerHeight / 2 + (event.beta || 0) * 4;
+        pointerX = window.innerWidth / 2 + event.gamma * 15;
+        pointerY = window.innerHeight / 2 + (event.beta || 0) * 8;
         requestUpdate();
       }
     };
@@ -137,11 +139,12 @@ export default function Home() {
 
 
 
+
   return (
     <main className="site-home">
-      <section className="home-hero" aria-label="Portfolio introduction">
-        <article className="hero-card hero-card-main">
-          <div className="hero-card-meta">
+      <section className="home-hero" data-motion-section aria-label="Portfolio introduction">
+        <article className="hero-card hero-card-main motion-card" data-card-layer data-base-z="30" data-depth="1.15" data-rotate="3" data-reveal-motion>
+          <div className="hero-card-meta" data-reveal-motion>
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
             <span>Menu</span>
@@ -153,7 +156,7 @@ export default function Home() {
           </h1>
         </article>
 
-        <article className="hero-card hero-card-strategy">
+        <article className="hero-card hero-card-strategy motion-card" data-card-layer data-base-z="65" data-depth="1.8" data-rotate="-5" data-reveal-motion>
           <div className="strategy-count">
             12 <span>/12</span>
           </div>
@@ -165,7 +168,7 @@ export default function Home() {
           <p>Graphic design, logos, layouts and creative direction.</p>
         </article>
 
-        <article className="hero-card hero-card-profile">
+        <article className="hero-card hero-card-profile motion-card" data-card-layer data-base-z="20" data-depth="0.85" data-rotate="-4" data-reveal-motion>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
@@ -187,9 +190,9 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="work-section" id="case-studies">
-        <div className="background-word">WORK</div>
-        <div className="section-heading">
+      <section className="work-section" data-motion-section data-reveal-motion id="case-studies">
+        <div className="background-word" data-reveal-motion>WORK</div>
+        <div className="section-heading" data-reveal-motion>
           <span>01</span>
           <h2>Case Studies</h2>
           <Link href="/projects">Archive</Link>
@@ -199,9 +202,7 @@ export default function Home() {
           {projects.map((project, index) => (
             <Link
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={20 + index} data-depth={0.35 + index * 0.12} data-rotate={index % 2 ? 2 : -2}
-              key={project.slug}
-            >
+              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={90 + index} data-depth={0.7 + index * 0.16} data-rotate={index % 2 ? 3 : -3} data-reveal-motion>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
@@ -214,9 +215,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="services-section" id="services">
-        <div className="background-word">SERVICES</div>
-        <div className="section-heading">
+      <section className="services-section" data-motion-section data-reveal-motion id="services">
+        <div className="background-word" data-reveal-motion>SERVICES</div>
+        <div className="section-heading" data-reveal-motion>
           <span>02</span>
           <h2>Services</h2>
           <span>Objects</span>
@@ -249,7 +250,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="about-section" id="about">
+      <section className="about-section" data-motion-section data-reveal-motion id="about">
         <span>03 / Profile</span>
         <p>
           I build visual systems, mobile-first web apps, editorial interfaces and experimental digital identities with a focus on typography, atmosphere and interaction.

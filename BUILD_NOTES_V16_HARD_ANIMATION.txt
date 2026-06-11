@@ -1,0 +1,6 @@
+Hard animation build targeting the actual current class names. Fixed the reason v15 looked static: hero cards were className="hero-card hero-card-*" and had not received data-card-layer/motion-card attributes. Checks: {
+  "hero-card-main motion": true,
+  "hero-card-strategy motion": true,
+  "hero-card-profile motion": true,
+  "client component": true
+}
