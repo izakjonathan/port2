@@ -1,0 +1,14 @@
+{
+  "source": "/mnt/data/portfolio-reference-collage-v17-centered-mobile.zip",
+  "root": "/mnt/data/portfolio_v18_mobile_center_hard_work",
+  "fix": "removed previous v17/v16 transform blocks and added one canonical mobile layout for real active hero-card classes",
+  "active_class_checks": {
+    "main": false,
+    "strategy": false,
+    "profile": false
+  },
+  "css_checks": {
+    "v17_removed": true,
+    "v18_present": true
+  }
+}
