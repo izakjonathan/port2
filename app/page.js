@@ -13,7 +13,10 @@ export default function Home() {
     const revealItems = Array.from(document.querySelectorAll("[data-reveal-motion]"));
 
     let raf = 0;
+    let running = true;
     let scrollY = window.scrollY;
+    let pointerX = window.innerWidth / 2;
+    let pointerY = window.innerHeight / 2;
 
     const bringToFront = (card) => {
       cards.forEach((item, index) => {
@@ -26,30 +29,33 @@ export default function Home() {
       activeCardRef.current = card;
     };
 
-    const update = () => {
-      raf = 0;
-      document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
+    const frame = (time) => {
+      if (!running) return;
 
-      cards.forEach((card) => {
-        const depth = Number(card.dataset.depth || 0);
-        const rect = card.getBoundingClientRect();
-        const viewportCenter = window.innerHeight / 2;
-        const cardCenter = rect.top + rect.height / 2;
-        const distance = (cardCenter - viewportCenter) / window.innerHeight;
-        const lift = Math.max(-18, Math.min(18, distance * depth * -28));
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const mx = (pointerX - centerX) / centerX;
+      const my = (pointerY - centerY) / centerY;
 
-        card.style.setProperty("--motion-lift", `${lift.toFixed(2)}px`);
+      cards.forEach((card, index) => {
+        const depth = Number(card.dataset.depth || 1);
+        const phase = Number(card.dataset.phase || index * 0.75);
+        const floatY = Math.sin(time / 720 + phase) * depth * 7;
+        const floatX = Math.cos(time / 950 + phase) * depth * 4;
+        const scrollLift = Math.max(-16, Math.min(16, scrollY * depth * -0.018));
+        const pointerXMove = mx * depth * 10;
+        const pointerYMove = my * depth * 8;
+
+        card.style.setProperty("--motion-x", `${(floatX + pointerXMove).toFixed(2)}px`);
+        card.style.setProperty("--motion-y", `${(floatY + scrollLift + pointerYMove).toFixed(2)}px`);
       });
-    };
 
-    const requestUpdate = () => {
-      if (!raf) raf = requestAnimationFrame(update);
+      raf = requestAnimationFrame(frame);
     };
 
     cards.forEach((card, index) => {
       const baseZ = Number(card.dataset.baseZ || index + 1);
       card.style.setProperty("--card-z", String(baseZ));
-      card.style.setProperty("--stagger", `${index * 75}ms`);
 
       card.addEventListener("click", (event) => {
         if (activeCardRef.current !== card) {
@@ -68,7 +74,7 @@ export default function Home() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) entry.target.classList.add("is-revealed");
       });
-    }, { threshold: 0.08, rootMargin: "0px 0px -4% 0px" });
+    }, { threshold: 0.08 });
 
     revealItems.forEach((item, index) => {
       item.style.setProperty("--reveal-delay", `${index * 55}ms`);
@@ -77,18 +83,23 @@ export default function Home() {
 
     const onScroll = () => {
       scrollY = window.scrollY;
-      requestUpdate();
+    };
+
+    const onPointerMove = (event) => {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
 
-    requestAnimationFrame(() => {
-      document.body.classList.add("motion-ready");
-      update();
-    });
+    document.body.classList.add("motion-ready");
+    raf = requestAnimationFrame(frame);
 
     return () => {
+      running = false;
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
       observer.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
@@ -98,10 +109,11 @@ export default function Home() {
 
 
 
+
   return (
     <main className="site-home">
       <section className="home-hero" data-motion-section aria-label="Portfolio introduction">
-        <article className="hero-card hero-card-main motion-card">
+        <article className="hero-card hero-card-main motion-card" data-card-layer data-base-z="30" data-depth="1.05" data-phase="0" data-reveal-motion>
           <div className="hero-card-meta" data-reveal-motion>
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
@@ -114,7 +126,7 @@ export default function Home() {
           </h1>
         </article>
 
-        <article className="hero-card hero-card-strategy motion-card">
+        <article className="hero-card hero-card-strategy motion-card" data-card-layer data-base-z="65" data-depth="1.35" data-phase="1.4" data-reveal-motion>
           <div className="strategy-count">
             12 <span>/12</span>
           </div>
@@ -126,7 +138,7 @@ export default function Home() {
           <p>Graphic design, logos, layouts and creative direction.</p>
         </article>
 
-        <article className="hero-card hero-card-profile motion-card">
+        <article className="hero-card hero-card-profile motion-card" data-card-layer data-base-z="20" data-depth=".85" data-phase="2.6" data-reveal-motion>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
@@ -160,7 +172,7 @@ export default function Home() {
           {projects.map((project, index) => (
             <Link
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={90 + index} data-depth={0.7 + index * 0.16} data-rotate={index % 2 ? 3 : -3} data-reveal-motion>
+              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={90 + index} data-depth={0.7 + index * 0.16} data-rotate={index % 2 ? 3 : -3} data-phase={index * 0.8} data-reveal-motion>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
