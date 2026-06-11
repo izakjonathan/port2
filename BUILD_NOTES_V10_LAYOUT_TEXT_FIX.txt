@@ -1,1 +1,0 @@
-Moved yellow C2 card higher to overlap halfway up C1, reduced fixed menu side margins, and restored the profile/about text to a more readable earlier-build format.

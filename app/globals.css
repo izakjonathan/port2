@@ -36,7 +36,7 @@
 
   /* Fixed menu */
   --menu-size: 17px;
-  --menu-x: 34px;
+  --menu-x: 22px;
   --menu-top: calc(env(safe-area-inset-top, 0px) + 10px);
   --menu-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
 
@@ -180,13 +180,13 @@ select {
 
 .hero-card-strategy {
   left: 7vw;
-  top: 51vh;
+  top: 38vh;
   width: min(34vw, 430px);
   min-height: 255px;
   padding: 26px;
   background: var(--yellow);
   color: var(--black);
-  z-index: 45;
+  z-index: 55;
   transform: rotate(-5deg);
 }
 
@@ -839,7 +839,7 @@ select {
 @media (max-width: 900px) {
   :root {
     --menu-size: 16px;
-    --menu-x: 34px;
+    --menu-x: 22px;
     --menu-top: calc(env(safe-area-inset-top, 0px) + 10px);
     --menu-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
 
@@ -874,7 +874,7 @@ select {
 
   .hero-card-strategy {
     left: 5vw;
-    top: 525px;
+    top: 330px;
     width: 56vw;
     min-height: 225px;
     padding: 18px;
@@ -991,19 +991,5 @@ select {
 
   .case-nav {
     grid-template-columns: 1fr;
-  }
-}
-
-
-
-
-/* V11 HARD FIX - CANONICAL MOBILE CARD POSITIONS */
-
-@media (max-width: 900px){
-  .ref3-yellow{
-    position:absolute !important;
-    top:330px !important;
-    left:5vw !important;
-    z-index:60 !important;
   }
 }
