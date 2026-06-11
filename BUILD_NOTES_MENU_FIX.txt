@@ -1,1 +1,0 @@
-Fixed missing header/footer menu. Cause: global [data-ref]{position:relative} overrode .site-menu{position:fixed}. Scoped data-ref reference labels and added hard fixed menu override.

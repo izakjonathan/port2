@@ -1,1 +1,0 @@
-Fixed visible reference labels, reduced fixed menu size, restored tighter overlapping card composition, and reduced excessive vertical spacing. References remain in code/data-ref and CARD_REFERENCES.md only.

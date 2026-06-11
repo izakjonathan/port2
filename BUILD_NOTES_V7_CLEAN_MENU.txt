@@ -1,1 +1,0 @@
-Cleaned duplicate appended CSS/control systems and replaced with one canonical V7 control layer. Header is now close to top, footer close to bottom. Menu size is controlled by --menu-size, --menu-top, --menu-bottom in app/globals.css.

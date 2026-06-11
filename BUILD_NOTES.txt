@@ -1,4 +1,0 @@
-Consolidated build folder.
-Root files are directly inside web_portfolio/.
-Excluded: .git, node_modules, .next, .DS_Store.
-Includes current app/page.js, app/globals.css, components/Nav.js, components/ProjectRow.js, data, public, package files.

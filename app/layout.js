@@ -7,12 +7,12 @@ export const viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#000000",
+  themeColor: "#d9d9d7",
 };
 
 export const metadata = {
   title: "Izak Hyllested",
-  description: "Graphic Designer & Creative Developer",
+  description: "Portfolio, graphic design and creative development",
   appleWebApp: {
     capable: true,
     title: "Izak Hyllested",

@@ -1,1 +1,0 @@
-Hard consolidation: removed all data-ref attributes from JSX, rebuilt Nav without data-ref, hid old duplicate menus/corner labels, reduced menu size, and forced compact mobile overlap for hero/project/service cards.
