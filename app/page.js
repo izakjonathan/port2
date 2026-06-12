@@ -102,13 +102,19 @@ export default function Home() {
       card.style.setProperty("--drag-x", "0px");
       card.style.setProperty("--drag-y", "0px");
 
+      card.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+      });
+
       card.addEventListener("click", (event) => {
         const sameCard = activeCardRef.current === card;
         const didDrag = card.dataset.didDrag === "true";
+        const href = card.dataset.cardHref;
+
+        event.preventDefault();
+        event.stopPropagation();
 
         if (!sameCard || didDrag) {
-          event.preventDefault();
-          event.stopPropagation();
           bringToFront(card);
           card.dataset.didDrag = "false";
           lastTapAt = Date.now();
@@ -117,11 +123,33 @@ export default function Home() {
 
         const now = Date.now();
         if (now - lastTapAt < 160) {
-          event.preventDefault();
-          event.stopPropagation();
+          lastTapAt = now;
+          return;
         }
+
         lastTapAt = now;
+
+        if (href) {
+          window.location.href = href;
+        }
       }, true);
+
+      card.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+
+        const href = card.dataset.cardHref;
+        if (!href) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (activeCardRef.current !== card) {
+          bringToFront(card);
+          return;
+        }
+
+        window.location.href = href;
+      });
 
       card.addEventListener("pointerdown", (event) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -283,15 +311,18 @@ export default function Home() {
 
         <div className="project-card-stage" data-project-stack>
           {projects.map((project, index) => (
-            <Link
+            <article
               key={project.slug}
-              href={`/projects/${project.slug}`}
               className={`project-card project-card-${index + 1}`}
               data-card-layer
               data-stack-card
+              data-card-href={`/projects/${project.slug}`}
               data-base-z={90 + index}
               data-depth={0.7 + index * 0.08}
               data-reveal
+              role="link"
+              tabIndex="0"
+              aria-label={`Open ${project.title}`}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
@@ -300,7 +331,7 @@ export default function Home() {
                 <small>{project.category}</small>
                 <small>{project.year}</small>
               </footer>
-            </Link>
+            </article>
           ))}
         </div>
       </section>

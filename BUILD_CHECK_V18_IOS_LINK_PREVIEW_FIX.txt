@@ -1,0 +1,21 @@
+Build: portfolio-reference-collage-v18-ios-link-preview-fix
+Baseline: portfolio-reference-collage-v17-touch-highlight-fix.zip
+
+Purpose:
+- Fix iPhone Safari long-press link preview on project cards.
+- Keep v17 touch highlight/text selection fix and v16 motion polish intact.
+
+Changes:
+- Project cards on the homepage are no longer native <a>/<Link> elements.
+- Project cards are now interactive <article> elements with data-card-href, role="link", tabIndex="0", and aria-label.
+- Existing card interaction controls navigation programmatically only on second tap when the card is already active.
+- Added contextmenu prevention on card layers to suppress mobile long-press menus/previews.
+- No visual, layout, routing, framework, or motion tuning changes.
+
+Verification:
+- npm ci completed.
+- npm run build completed successfully with Next.js 15.5.18.
+- Static pages generated successfully: /, /projects, /projects/[slug].
+
+Notes:
+- npm audit still reports 2 moderate advisories inherited from the Next/PostCSS chain. No forced audit fix was applied.
