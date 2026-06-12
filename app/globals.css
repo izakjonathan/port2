@@ -1087,6 +1087,16 @@ body::before{
   backface-visibility:hidden;
   transform-style:preserve-3d;
   -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+.hero-card *,
+.project-card *,
+.service-card *{
+  -webkit-user-select:none;
+  user-select:none;
 }
 
 .hero-card.is-touching,
