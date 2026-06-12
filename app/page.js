@@ -256,47 +256,45 @@ export default function Home() {
       <section className="home-hero" aria-label="Portfolio introduction">
         <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1" data-reveal>
           <div className="hero-card-meta">
-            <strong>Study/Clyb</strong>
-            <span>Search Work</span>
-            <span>Menu</span>
+            <strong>Izak Hyllested</strong>
+            <span>Design & Development</span>
+            <span>2026</span>
           </div>
 
           <h1>
-            <span>Turning Ideas</span>
-            Into Visual Systems And Digital Products.
+            <span>Design, Built</span>
+            To Work As Well As It Looks.
           </h1>
         </article>
 
         <article className="hero-card hero-card-strategy" data-card-layer data-base-z="65" data-depth="1.12" data-reveal>
           <div className="strategy-count">
-            12 <span>/12</span>
+            5 <span>/5</span>
           </div>
           <h2>
-            Strategy
+            Projects
             <br />
-            <span>Session</span>
+            <span>Live</span>
           </h2>
-          <p>Graphic design, logos, layouts and creative direction.</p>
+          <p>Dashboards, apps, identity systems and this site.</p>
         </article>
 
         <article className="hero-card hero-card-profile" data-card-layer data-base-z="20" data-depth=".9" data-reveal>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
-            <span>45</span>
-            <small>Level</small>
+            <span>↗</span>
           </div>
           <div className="done-count">
-            <small>Done</small>
-            <span>21</span>
+            <small>Since</small>
+            <span>&#8217;19</span>
           </div>
           <ul>
-            <li><b>S</b>Seamless</li>
-            <li><b>P</b>Powerful</li>
-            <li><b>S</b>Scalable</li>
-            <li><b>M</b>Main</li>
-            <li><b>O</b>Optimized</li>
-            <li><b>E</b>Elite</li>
+            <li><b>D</b>Design</li>
+            <li><b>T</b>Typography</li>
+            <li><b>M</b>Motion</li>
+            <li><b>P</b>Product</li>
+            <li><b>C</b>Code</li>
           </ul>
         </article>
       </section>
@@ -341,32 +339,32 @@ export default function Home() {
         <div className="section-heading" data-reveal>
           <span>02</span>
           <h2>Services</h2>
-          <span>Objects</span>
+          <span>Available</span>
         </div>
 
         <div className="service-card-stage">
           <article className="service-card service-card-graphic" data-card-layer data-base-z="120" data-depth=".8" data-reveal>
             <span>01</span>
             <h3>Graphic Design</h3>
-            <p>Logos, typography, menus, posters, print systems and visual identity.</p>
+            <p>Identity, typography, print and visual systems built to last.</p>
           </article>
 
           <article className="service-card service-card-web" data-card-layer data-base-z="125" data-depth=".95" data-reveal>
             <span>02</span>
             <h3>Web Design</h3>
-            <p>Editorial websites, portfolios, landing pages and interaction-led layouts.</p>
+            <p>Editorial sites, portfolios and interaction-led layouts.</p>
           </article>
 
           <article className="service-card service-card-dev" data-card-layer data-base-z="130" data-depth=".9" data-reveal>
             <span>03</span>
             <h3>Development</h3>
-            <p>Next.js builds, dashboards, custom tools, automation and deployment.</p>
+            <p>Next.js builds, dashboards, custom tools and deployment.</p>
           </article>
 
           <article className="service-card service-card-editorial" data-card-layer data-base-z="115" data-depth=".75" data-reveal>
             <span>04</span>
             <h3>Editorial</h3>
-            <p>Reports, presentations, publications and information design.</p>
+            <p>Reports, publications and information design.</p>
           </article>
         </div>
       </section>
@@ -374,7 +372,7 @@ export default function Home() {
       <section className="about-section" data-reveal id="about">
         <span>03 / Profile</span>
         <p>
-          I build visual systems, mobile-first web apps, editorial interfaces and experimental digital identities with a focus on typography, atmosphere and interaction.
+          Visual systems, mobile-first web apps and editorial interfaces — made with care for typography, motion and the details that separate something finished from something done.
         </p>
         <a href="mailto:izakhyllested@icloud.com">Contact</a>
       </section>
