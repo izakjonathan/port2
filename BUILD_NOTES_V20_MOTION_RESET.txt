@@ -1,5 +1,0 @@
-{
-  "built_from": "/mnt/data/portfolio-reference-collage-v12-hard-actual-fixes.zip",
-  "no_old_animation_chain": true,
-  "hero_cards_have_data_layer": true
-}
