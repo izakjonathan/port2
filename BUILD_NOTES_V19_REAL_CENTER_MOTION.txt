@@ -1,9 +1,0 @@
-Fixed the actual root cause: hero cards had .motion-card but no data-card-layer, so the JS never animated them. Also corrected mobile transforms from translateX(-30%) to true centered composition and centered project/service card stacks.
-
-{
-  "hero_main_has_data_card_layer": true,
-  "hero_strategy_has_data_card_layer": true,
-  "hero_profile_has_data_card_layer": true,
-  "old_v18_block_removed": true,
-  "v19_block_present": true
-}

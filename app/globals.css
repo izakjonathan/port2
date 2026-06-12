@@ -151,7 +151,7 @@ select {
   background: var(--pink);
   color: var(--black);
   z-index: 30;
-  transform: translateX(-42%) rotate(3deg);
+  transform: translateX(calc(-42% + var(--mx, 0px))) translateY(var(--my, 0px)) rotate(3deg) scale(var(--scale, 1));
 }
 
 .hero-card-meta {
@@ -187,7 +187,7 @@ select {
   background: var(--yellow);
   color: var(--black);
   z-index: 55;
-  transform: rotate(-5deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(-5deg) scale(var(--scale, 1));
 }
 
 .strategy-count {
@@ -230,7 +230,7 @@ select {
   background: var(--white-card);
   color: var(--black);
   z-index: 18;
-  transform: rotate(-4deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(-4deg) scale(var(--scale, 1));
 }
 
 .profile-dots {
@@ -421,7 +421,7 @@ select {
   top: 15px;
   width: 76vw;
   background: var(--pink);
-  transform: rotate(-3deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(-3deg) scale(var(--scale, 1));
 }
 
 .project-card-2 {
@@ -430,7 +430,7 @@ select {
   width: 76vw;
   background: #000;
   color: #fff;
-  transform: rotate(4deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(4deg) scale(var(--scale, 1));
 }
 
 .project-card-2 h3,
@@ -454,7 +454,7 @@ select {
   top: 440px;
   width: 76vw;
   background: var(--yellow);
-  transform: rotate(2deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(2deg) scale(var(--scale, 1));
 }
 
 .project-card-4 {
@@ -462,7 +462,7 @@ select {
   top: 655px;
   width: 76vw;
   background: var(--orange);
-  transform: rotate(-2deg);
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(-2deg) scale(var(--scale, 1));
 }
 
 .project-card-5 {
@@ -860,7 +860,7 @@ select {
     width: 74vw;
     min-height: 455px;
     padding: 18px 18px 34px;
-    transform: translateX(-42%) rotate(3deg);
+    transform: translateX(calc(-42% + var(--mx, 0px))) translateY(var(--my, 0px)) rotate(3deg) scale(var(--scale, 1));
   }
 
   .hero-card-meta {
@@ -995,95 +995,45 @@ select {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* =====================================================
-   V19 REAL CENTER + REAL MOTION
-   Cause fixed:
-   - Hero cards had .motion-card but did NOT have data-card-layer, so JS animation never targeted them.
-   - Previous mobile transforms used translateX(-30%), which intentionally pushed the pink card right.
-   - This is the single canonical mobile card layout and motion system.
+   V20 MOTION RESET
+   Built from clean V12 baseline. No stacked old animation blocks.
+   Animation variables are integrated into the real layout transforms.
    ===================================================== */
 
-:root{
-  --motion-speed:420ms;
-  --motion-ease:cubic-bezier(.16,1,.3,1);
-}
-
-.fixed-menu{
-  z-index:10000 !important;
-}
-
-.fixed-menu-inner{
-  padding-left:22px !important;
-  padding-right:22px !important;
-}
-
-.motion-card{
-  z-index:var(--card-z,1) !important;
+.hero-card,
+.project-card,
+.service-card{
+  z-index:var(--z, auto) !important;
   cursor:pointer;
   touch-action:manipulation;
   transition:
-    transform var(--motion-speed) var(--motion-ease),
-    box-shadow var(--motion-speed) var(--motion-ease),
-    filter var(--motion-speed) var(--motion-ease),
-    opacity var(--motion-speed) var(--motion-ease);
+    transform 420ms cubic-bezier(.16,1,.3,1),
+    box-shadow 420ms cubic-bezier(.16,1,.3,1),
+    filter 420ms cubic-bezier(.16,1,.3,1),
+    opacity 420ms cubic-bezier(.16,1,.3,1);
   will-change:transform;
 }
 
-.motion-card.is-card-front{
-  box-shadow:0 48px 130px rgba(0,0,0,.3) !important;
-  filter:saturate(1.1) contrast(1.03);
+.hero-card.is-front,
+.project-card.is-front,
+.service-card.is-front{
+  --scale:1.035;
+  box-shadow:0 48px 130px rgba(0,0,0,.28) !important;
+  filter:saturate(1.08) contrast(1.03);
 }
 
-[data-reveal-motion]{
+[data-reveal]{
   opacity:0;
 }
 
-.motion-ready [data-reveal-motion]{
-  animation:revealInV19 650ms var(--motion-ease) forwards;
-  animation-delay:var(--reveal-delay,0ms);
+.motion-ready [data-reveal]{
+  animation:revealV20 620ms cubic-bezier(.16,1,.3,1) forwards;
+  animation-delay:var(--delay,0ms);
 }
 
-/* Desktop positioning keeps the intended card collage but adds real movement */
-.hero-card-main.motion-card{
-  transform:
-    translateX(-42%)
-    translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-    rotate(3deg)
-    scale(var(--card-scale,1)) !important;
-}
-
-.hero-card-strategy.motion-card{
-  transform:
-    translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-    rotate(-5deg)
-    scale(var(--card-scale,1)) !important;
-}
-
-.hero-card-profile.motion-card{
-  transform:
-    translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-    rotate(-4deg)
-    scale(var(--card-scale,1)) !important;
-}
-
-.hero-card.motion-card.is-card-front{
-  --card-scale:1.035;
-}
-
-/* MOBILE: centered card group, no off-screen drift */
-@media(max-width:900px){
+/* Mobile: one centered composition source of truth */
+@media (max-width:900px){
   html,
   body{
     overflow-x:hidden !important;
@@ -1091,65 +1041,50 @@ select {
 
   .home-hero{
     overflow:hidden !important;
-    width:100vw !important;
-    max-width:100vw !important;
+    min-height:850px !important;
   }
 
-  .hero-card{
-    box-sizing:border-box !important;
-    max-width:none !important;
-  }
-
-  .hero-card-main.motion-card{
+  .hero-card-main{
     left:50% !important;
     right:auto !important;
     top:112px !important;
-    width:76vw !important;
+    width:74vw !important;
     min-height:455px !important;
     transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
+      translateX(calc(-45% + var(--mx, 0px)))
+      translateY(var(--my, 0px))
       rotate(3deg)
-      scale(var(--card-scale,1)) !important;
-    transform-origin:center center !important;
+      scale(var(--scale, 1)) !important;
   }
 
-  .hero-card-strategy.motion-card{
+  .hero-card-strategy{
     left:50% !important;
     right:auto !important;
-    top:370px !important;
-    width:58vw !important;
+    top:330px !important;
+    width:56vw !important;
     min-height:225px !important;
     transform:
-      translateX(-62%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
+      translateX(calc(-78% + var(--mx, 0px)))
+      translateY(var(--my, 0px))
       rotate(-5deg)
-      scale(var(--card-scale,1)) !important;
-    transform-origin:center center !important;
+      scale(var(--scale, 1)) !important;
   }
 
-  .hero-card-profile.motion-card{
+  .hero-card-profile{
     left:50% !important;
     right:auto !important;
-    top:245px !important;
+    top:230px !important;
     width:58vw !important;
     min-height:370px !important;
     transform:
-      translateX(-27%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
+      translateX(calc(-22% + var(--mx, 0px)))
+      translateY(var(--my, 0px))
       rotate(-4deg)
-      scale(var(--card-scale,1)) !important;
-    transform-origin:center center !important;
+      scale(var(--scale, 1)) !important;
   }
 
-  .hero-card.motion-card.is-card-front{
-    --card-scale:1.03;
-  }
-
-  /* Center the case-study stack too */
   .project-card-stage{
     min-height:1180px !important;
-    overflow:visible !important;
   }
 
   .project-card{
@@ -1161,105 +1096,31 @@ select {
 
   .project-card-1{
     top:10px !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px),0)
-      rotate(-3deg)
-      scale(var(--card-scale,1)) !important;
+    transform:translateX(calc(-50% + var(--mx,0px))) translateY(var(--my,0px)) rotate(-3deg) scale(var(--scale,1)) !important;
   }
 
   .project-card-2{
     top:220px !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px),0)
-      rotate(4deg)
-      scale(var(--card-scale,1)) !important;
+    transform:translateX(calc(-50% + var(--mx,0px))) translateY(var(--my,0px)) rotate(4deg) scale(var(--scale,1)) !important;
   }
 
   .project-card-3{
     top:440px !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px),0)
-      rotate(2deg)
-      scale(var(--card-scale,1)) !important;
+    transform:translateX(calc(-50% + var(--mx,0px))) translateY(var(--my,0px)) rotate(2deg) scale(var(--scale,1)) !important;
   }
 
   .project-card-4{
     top:660px !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px),0)
-      rotate(-2deg)
-      scale(var(--card-scale,1)) !important;
+    transform:translateX(calc(-50% + var(--mx,0px))) translateY(var(--my,0px)) rotate(-2deg) scale(var(--scale,1)) !important;
   }
 
   .project-card-5{
     top:880px !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px),0)
-      rotate(3deg)
-      scale(var(--card-scale,1)) !important;
-  }
-
-  /* Center service cards on mobile */
-  .service-card{
-    left:50% !important;
-    right:auto !important;
-    width:84vw !important;
-    max-width:360px !important;
-  }
-
-  .service-card-graphic{
-    transform:translateX(-50%) rotate(-4deg) !important;
-  }
-
-  .service-card-web{
-    transform:translateX(-50%) rotate(3deg) !important;
-  }
-
-  .service-card-dev{
-    transform:translateX(-50%) rotate(-3deg) !important;
-  }
-
-  .service-card-editorial{
-    transform:translateX(-50%) rotate(2deg) !important;
+    transform:translateX(calc(-50% + var(--mx,0px))) translateY(var(--my,0px)) rotate(3deg) scale(var(--scale,1)) !important;
   }
 }
 
-/* Extra mobile narrow tuning */
-@media(max-width:430px){
-  .hero-card-main.motion-card{
-    width:76vw !important;
-    transform:
-      translateX(-50%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-      rotate(3deg)
-      scale(var(--card-scale,1)) !important;
-  }
-
-  .hero-card-strategy.motion-card{
-    width:58vw !important;
-    transform:
-      translateX(-62%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-      rotate(-5deg)
-      scale(var(--card-scale,1)) !important;
-  }
-
-  .hero-card-profile.motion-card{
-    width:58vw !important;
-    transform:
-      translateX(-27%)
-      translate3d(var(--motion-x,0px), var(--motion-y,0px), 0)
-      rotate(-4deg)
-      scale(var(--card-scale,1)) !important;
-  }
-}
-
-@keyframes revealInV19{
+@keyframes revealV20{
   from{
     opacity:0;
     filter:blur(8px);
@@ -1267,5 +1128,14 @@ select {
   to{
     opacity:1;
     filter:blur(0);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation:none !important;
+    transition:none !important;
   }
 }

@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
-    const revealItems = Array.from(document.querySelectorAll("[data-reveal-motion]"));
+    const revealItems = Array.from(document.querySelectorAll("[data-reveal]"));
 
     let raf = 0;
     let running = true;
@@ -20,12 +20,12 @@ export default function Home() {
 
     const bringToFront = (card) => {
       cards.forEach((item, index) => {
-        item.classList.remove("is-card-front");
-        item.style.setProperty("--card-z", String(Number(item.dataset.baseZ || index + 1)));
+        item.classList.remove("is-front");
+        item.style.setProperty("--z", String(Number(item.dataset.baseZ || index + 1)));
       });
 
-      card.classList.add("is-card-front");
-      card.style.setProperty("--card-z", "900");
+      card.classList.add("is-front");
+      card.style.setProperty("--z", "900");
       activeCardRef.current = card;
     };
 
@@ -40,22 +40,21 @@ export default function Home() {
       cards.forEach((card, index) => {
         const depth = Number(card.dataset.depth || 1);
         const phase = Number(card.dataset.phase || index * 0.75);
-        const floatY = Math.sin(time / 720 + phase) * depth * 7;
-        const floatX = Math.cos(time / 950 + phase) * depth * 4;
-        const scrollLift = Math.max(-16, Math.min(16, scrollY * depth * -0.018));
-        const pointerXMove = mx * depth * 10;
-        const pointerYMove = my * depth * 8;
+        const floatX = Math.cos(time / 1100 + phase) * depth * 3.5;
+        const floatY = Math.sin(time / 850 + phase) * depth * 7;
+        const pointerMoveX = mx * depth * 7;
+        const pointerMoveY = my * depth * 6;
+        const scrollMove = Math.max(-12, Math.min(12, scrollY * depth * -0.012));
 
-        card.style.setProperty("--motion-x", `${(floatX + pointerXMove).toFixed(2)}px`);
-        card.style.setProperty("--motion-y", `${(floatY + scrollLift + pointerYMove).toFixed(2)}px`);
+        card.style.setProperty("--mx", `${(floatX + pointerMoveX).toFixed(2)}px`);
+        card.style.setProperty("--my", `${(floatY + pointerMoveY + scrollMove).toFixed(2)}px`);
       });
 
       raf = requestAnimationFrame(frame);
     };
 
     cards.forEach((card, index) => {
-      const baseZ = Number(card.dataset.baseZ || index + 1);
-      card.style.setProperty("--card-z", String(baseZ));
+      card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
 
       card.addEventListener("click", (event) => {
         if (activeCardRef.current !== card) {
@@ -72,12 +71,12 @@ export default function Home() {
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("is-revealed");
+        if (entry.isIntersecting) entry.target.classList.add("is-visible");
       });
-    }, { threshold: 0.08 });
+    }, { threshold: 0.1 });
 
     revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${index * 55}ms`);
+      item.style.setProperty("--delay", `${index * 55}ms`);
       observer.observe(item);
     });
 
@@ -105,16 +104,11 @@ export default function Home() {
     };
   }, []);
 
-
-
-
-
-
   return (
     <main className="site-home">
-      <section className="home-hero" data-motion-section aria-label="Portfolio introduction">
-        <article className="hero-card hero-card-main motion-card" data-card-layer data-base-z="30" data-depth="1.05" data-phase="0" data-reveal-motion>
-          <div className="hero-card-meta" data-reveal-motion>
+      <section className="home-hero" aria-label="Portfolio introduction">
+        <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1.05" data-phase="0" data-reveal>
+          <div className="hero-card-meta">
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
             <span>Menu</span>
@@ -126,7 +120,7 @@ export default function Home() {
           </h1>
         </article>
 
-        <article className="hero-card hero-card-strategy motion-card" data-card-layer data-base-z="65" data-depth="1.35" data-phase="1.4" data-reveal-motion>
+        <article className="hero-card hero-card-strategy" data-card-layer data-base-z="65" data-depth="1.25" data-phase="1.4" data-reveal>
           <div className="strategy-count">
             12 <span>/12</span>
           </div>
@@ -138,7 +132,7 @@ export default function Home() {
           <p>Graphic design, logos, layouts and creative direction.</p>
         </article>
 
-        <article className="hero-card hero-card-profile motion-card" data-card-layer data-base-z="20" data-depth=".85" data-phase="2.6" data-reveal-motion>
+        <article className="hero-card hero-card-profile" data-card-layer data-base-z="20" data-depth=".85" data-phase="2.6" data-reveal>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
@@ -160,9 +154,9 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="work-section" data-motion-section data-reveal-motion id="case-studies">
-        <div className="background-word" data-reveal-motion>WORK</div>
-        <div className="section-heading" data-reveal-motion>
+      <section className="work-section" data-reveal id="case-studies">
+        <div className="background-word">WORK</div>
+        <div className="section-heading">
           <span>01</span>
           <h2>Case Studies</h2>
           <Link href="/projects">Archive</Link>
@@ -172,7 +166,9 @@ export default function Home() {
           {projects.map((project, index) => (
             <Link
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1} motion-card`} data-card-layer data-base-z={90 + index} data-depth={0.7 + index * 0.16} data-rotate={index % 2 ? 3 : -3} data-phase={index * 0.8} data-reveal-motion>
+              className={`project-card project-card-${index + 1}`} data-card-layer data-base-z={90 + index} data-depth={0.65 + index * 0.12} data-phase={index * 0.8} data-reveal
+              key={project.slug}
+            >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
@@ -185,34 +181,34 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="services-section" data-motion-section data-reveal-motion id="services">
-        <div className="background-word" data-reveal-motion>SERVICES</div>
-        <div className="section-heading" data-reveal-motion>
+      <section className="services-section" data-reveal id="services">
+        <div className="background-word">SERVICES</div>
+        <div className="section-heading">
           <span>02</span>
           <h2>Services</h2>
           <span>Objects</span>
         </div>
 
         <div className="service-card-stage">
-          <article className="service-card service-card-graphic">
+          <article className="service-card service-card-graphic" data-card-layer data-base-z="120" data-depth=".8" data-phase="0.2" data-reveal>
             <span>01</span>
             <h3>Graphic Design</h3>
             <p>Logos, typography, menus, posters, print systems and visual identity.</p>
           </article>
 
-          <article className="service-card service-card-web">
+          <article className="service-card service-card-web" data-card-layer data-base-z="125" data-depth="1" data-phase="1.1" data-reveal>
             <span>02</span>
             <h3>Web Design</h3>
             <p>Editorial websites, portfolios, landing pages and interaction-led layouts.</p>
           </article>
 
-          <article className="service-card service-card-dev">
+          <article className="service-card service-card-dev" data-card-layer data-base-z="130" data-depth=".9" data-phase="1.9" data-reveal>
             <span>03</span>
             <h3>Development</h3>
             <p>Next.js builds, dashboards, custom tools, automation and deployment.</p>
           </article>
 
-          <article className="service-card service-card-editorial">
+          <article className="service-card service-card-editorial" data-card-layer data-base-z="115" data-depth=".75" data-phase="2.7" data-reveal>
             <span>04</span>
             <h3>Editorial</h3>
             <p>Reports, presentations, publications and information design.</p>
@@ -220,7 +216,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="about-section" data-motion-section data-reveal-motion id="about">
+      <section className="about-section" data-reveal id="about">
         <span>03 / Profile</span>
         <p>
           I build visual systems, mobile-first web apps, editorial interfaces and experimental digital identities with a focus on typography, atmosphere and interaction.

@@ -1,1 +1,0 @@
-Animation-heavy build: adds entrance reveals, parallax, pointer/device tilt, idle floating, background light movement, section motion, menu entrance, and first-tap-front/second-tap-open card behavior.

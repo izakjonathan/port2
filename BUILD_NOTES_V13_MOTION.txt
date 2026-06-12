@@ -1,1 +1,0 @@
-Added parallax and press-to-front card interaction. Cards use .motion-card and data-card-layer attributes. Tapping/pressing a card brings it to the front.
