@@ -7,93 +7,83 @@ import { projects } from "../data/projects";
 export default function Home() {
 
   const activeCardRef = useRef(null);
+  const dragFrameRef = useRef(null);
+  const scrollFrameRef = useRef(null);
 
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
     const revealItems = Array.from(document.querySelectorAll("[data-reveal]"));
     const projectStack = document.querySelector("[data-project-stack]");
+    const projectCards = projectStack
+      ? Array.from(projectStack.querySelectorAll("[data-stack-card]"))
+      : [];
     const menuNodes = Array.from(document.querySelectorAll(".fixed-menu"));
 
     let currentDrag = null;
-    let raf = 0;
-    let running = true;
-    let scrollY = window.scrollY;
     let lastScrollY = window.scrollY;
-    let scrollDirection = "up";
-    let lastTapTime = 0;
+    let lastTapAt = 0;
 
-    const resetCardLayer = () => {
-      cards.forEach((item, index) => {
-        item.classList.remove("is-front");
-        item.style.setProperty("--z", String(Number(item.dataset.baseZ || index + 1)));
+    const resetCardLayers = () => {
+      cards.forEach((card, index) => {
+        card.classList.remove("is-front");
+        card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
       });
     };
 
     const bringToFront = (card) => {
-      resetCardLayer();
+      resetCardLayers();
       card.classList.add("is-front");
       card.style.setProperty("--z", "900");
       activeCardRef.current = card;
     };
 
-    const snapBack = (card) => {
-      card.classList.remove("is-dragging");
-      card.style.setProperty("--drag-x", "0px");
-      card.style.setProperty("--drag-y", "0px");
+    const setDragVars = (card, x, y) => {
+      card.style.setProperty("--drag-x", `${x.toFixed(2)}px`);
+      card.style.setProperty("--drag-y", `${y.toFixed(2)}px`);
     };
 
-    const updateProjectStack = () => {
-      if (!projectStack) return;
-
-      const rect = projectStack.getBoundingClientRect();
-      const viewport = window.innerHeight;
-      const raw = (viewport * 0.72 - rect.top) / Math.max(rect.height - viewport * 0.4, 1);
-      const progress = Math.max(0, Math.min(1, raw));
-
-      projectStack.style.setProperty("--stack-progress", progress.toFixed(4));
-
-      const projectCards = Array.from(projectStack.querySelectorAll("[data-stack-card]"));
-      projectCards.forEach((card, index) => {
-        const count = Math.max(projectCards.length - 1, 1);
-        const local = Math.max(0, Math.min(1, progress * count - index + 1));
-        const stackY = (1 - local) * (22 + index * 4);
-        const stackScale = 0.94 + local * 0.06;
-        const stackOpacity = 0.55 + local * 0.45;
-
-        card.style.setProperty("--stack-y", `${stackY.toFixed(2)}px`);
-        card.style.setProperty("--stack-scale", stackScale.toFixed(3));
-        card.style.setProperty("--stack-opacity", stackOpacity.toFixed(3));
-      });
+    const clearDrag = (card) => {
+      card.classList.remove("is-touching", "is-dragging");
+      setDragVars(card, 0, 0);
     };
 
-    const updateMenuState = () => {
-      const isDown = scrollDirection === "down" && scrollY > 70;
+    const updateScrollMotion = () => {
+      scrollFrameRef.current = null;
+
+      const scrollY = window.scrollY;
+      const scrollingDown = scrollY > lastScrollY && scrollY > 72;
+      lastScrollY = scrollY;
+
       menuNodes.forEach((menu) => {
-        menu.classList.toggle("is-scroll-down", isDown);
-        menu.classList.toggle("is-scroll-up", !isDown);
+        menu.classList.toggle("is-scroll-down", scrollingDown);
       });
+
+      if (projectStack && projectCards.length) {
+        const rect = projectStack.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || 1;
+        const progress = Math.max(
+          0,
+          Math.min(1, (viewportHeight * 0.7 - rect.top) / Math.max(rect.height - viewportHeight * 0.45, 1))
+        );
+
+        projectCards.forEach((card, index) => {
+          const step = progress * Math.max(projectCards.length - 1, 1);
+          const active = Math.max(0, Math.min(1, step - index + 1));
+          const y = (1 - active) * (18 + index * 3);
+          const scale = 0.965 + active * 0.035;
+          const opacity = 0.72 + active * 0.28;
+
+          card.style.setProperty("--stack-y", `${y.toFixed(2)}px`);
+          card.style.setProperty("--stack-scale", scale.toFixed(3));
+          card.style.setProperty("--stack-opacity", opacity.toFixed(3));
+        });
+      }
     };
 
-    const frame = (time) => {
-      if (!running) return;
-
-      cards.forEach((card, index) => {
-        const depth = Number(card.dataset.depth || 1);
-        const phase = Number(card.dataset.phase || index * 0.6);
-        const floatX = Math.cos(time / 1250 + phase) * depth * 2.8;
-        const floatY = Math.sin(time / 930 + phase) * depth * 6;
-        const scrollLift = Math.max(-10, Math.min(10, scrollY * depth * -0.01));
-        card.style.setProperty("--float-x", `${floatX.toFixed(2)}px`);
-        card.style.setProperty("--float-y", `${(floatY + scrollLift).toFixed(2)}px`);
-      });
-
-      document.documentElement.style.setProperty("--ambient-y", `${Math.sin(time / 1800).toFixed(4)}`);
-      document.documentElement.style.setProperty("--ambient-x", `${Math.cos(time / 2100).toFixed(4)}`);
-
-      updateProjectStack();
-      updateMenuState();
-
-      raf = requestAnimationFrame(frame);
+    const requestScrollMotion = () => {
+      if (!scrollFrameRef.current) {
+        scrollFrameRef.current = requestAnimationFrame(updateScrollMotion);
+      }
     };
 
     cards.forEach((card, index) => {
@@ -102,36 +92,40 @@ export default function Home() {
       card.style.setProperty("--drag-y", "0px");
 
       card.addEventListener("click", (event) => {
-        const isSameCard = activeCardRef.current === card;
-        const moved = card.dataset.didDrag === "true";
+        const sameCard = activeCardRef.current === card;
+        const didDrag = card.dataset.didDrag === "true";
 
-        if (!isSameCard || moved) {
+        if (!sameCard || didDrag) {
           event.preventDefault();
           event.stopPropagation();
           bringToFront(card);
           card.dataset.didDrag = "false";
-          lastTapTime = Date.now();
+          lastTapAt = Date.now();
           return;
         }
 
         const now = Date.now();
-        if (now - lastTapTime < 180) {
+        if (now - lastTapAt < 160) {
           event.preventDefault();
           event.stopPropagation();
         }
-        lastTapTime = now;
+        lastTapAt = now;
       }, true);
 
       card.addEventListener("pointerdown", (event) => {
         bringToFront(card);
+        card.dataset.didDrag = "false";
+        card.classList.add("is-touching");
+
         currentDrag = {
           card,
           pointerId: event.pointerId,
           startX: event.clientX,
           startY: event.clientY,
+          nextX: 0,
+          nextY: 0,
         };
-        card.dataset.didDrag = "false";
-        card.classList.add("is-touching");
+
         try {
           card.setPointerCapture(event.pointerId);
         } catch {}
@@ -143,65 +137,72 @@ export default function Home() {
         const dx = event.clientX - currentDrag.startX;
         const dy = event.clientY - currentDrag.startY;
 
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
           card.dataset.didDrag = "true";
           card.classList.add("is-dragging");
         }
 
-        const dragX = Math.max(-44, Math.min(44, dx * 0.34));
-        const dragY = Math.max(-36, Math.min(36, dy * 0.26));
-        card.style.setProperty("--drag-x", `${dragX.toFixed(2)}px`);
-        card.style.setProperty("--drag-y", `${dragY.toFixed(2)}px`);
+        currentDrag.nextX = Math.max(-34, Math.min(34, dx * 0.26));
+        currentDrag.nextY = Math.max(-26, Math.min(26, dy * 0.2));
+
+        if (!dragFrameRef.current) {
+          dragFrameRef.current = requestAnimationFrame(() => {
+            dragFrameRef.current = null;
+            if (currentDrag) {
+              setDragVars(currentDrag.card, currentDrag.nextX, currentDrag.nextY);
+            }
+          });
+        }
       });
 
       card.addEventListener("pointerup", (event) => {
         if (!currentDrag || currentDrag.card !== card || currentDrag.pointerId !== event.pointerId) return;
-        card.classList.remove("is-touching");
-        snapBack(card);
+        clearDrag(card);
         currentDrag = null;
       });
 
       card.addEventListener("pointercancel", () => {
-        card.classList.remove("is-touching");
-        snapBack(card);
+        clearDrag(card);
         currentDrag = null;
       });
     });
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("is-visible");
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
       });
-    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
 
     revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${index * 58}ms`);
+      item.style.setProperty("--reveal-delay", `${Math.min(index * 45, 260)}ms`);
       observer.observe(item);
     });
 
     const onScroll = () => {
-      lastScrollY = scrollY;
-      scrollY = window.scrollY;
-      scrollDirection = scrollY > lastScrollY ? "down" : "up";
+      requestScrollMotion();
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     document.body.classList.add("motion-ready");
-    raf = requestAnimationFrame(frame);
+    requestScrollMotion();
 
     return () => {
-      running = false;
       window.removeEventListener("scroll", onScroll);
       observer.disconnect();
-      if (raf) cancelAnimationFrame(raf);
+      if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
+      if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
     };
   }, []);
+
 
 
   return (
     <main className="site-home">
       <section className="home-hero" aria-label="Portfolio introduction">
-        <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1.05" data-phase="0" data-reveal>
+        <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1" data-reveal>
           <div className="hero-card-meta">
             <strong>Study/Clyb</strong>
             <span>Search Work</span>
@@ -214,7 +215,7 @@ export default function Home() {
           </h1>
         </article>
 
-        <article className="hero-card hero-card-strategy" data-card-layer data-base-z="65" data-depth="1.25" data-phase="1.4" data-reveal>
+        <article className="hero-card hero-card-strategy" data-card-layer data-base-z="65" data-depth="1.12" data-reveal>
           <div className="strategy-count">
             12 <span>/12</span>
           </div>
@@ -226,7 +227,7 @@ export default function Home() {
           <p>Graphic design, logos, layouts and creative direction.</p>
         </article>
 
-        <article className="hero-card hero-card-profile" data-card-layer data-base-z="20" data-depth=".85" data-phase="2.6" data-reveal>
+        <article className="hero-card hero-card-profile" data-card-layer data-base-z="20" data-depth=".9" data-reveal>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
@@ -250,17 +251,17 @@ export default function Home() {
 
       <section className="work-section" data-reveal id="case-studies">
         <div className="background-word" data-reveal>WORK</div>
-        <div className="section-heading" data-reveal data-reveal>
+        <div className="section-heading" data-reveal>
           <span>01</span>
           <h2>Case Studies</h2>
           <Link href="/projects">Archive</Link>
         </div>
 
-        <div className="project-card-stage" data-project-stack>
+        <div className="project-card-stage" data-project-stack data-project-stack>
           {projects.map((project, index) => (
             <Link
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1}`} data-card-layer data-stack-card data-base-z={90 + index} data-depth={0.68 + index * 0.12} data-phase={index * 0.75} data-reveal>
+              className={`project-card project-card-${index + 1}`} data-card-layer data-stack-card data-base-z={90 + index} data-depth={0.7 + index * 0.08} data-reveal>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
@@ -275,32 +276,32 @@ export default function Home() {
 
       <section className="services-section" data-reveal id="services">
         <div className="background-word" data-reveal>SERVICES</div>
-        <div className="section-heading" data-reveal data-reveal>
+        <div className="section-heading" data-reveal>
           <span>02</span>
           <h2>Services</h2>
           <span>Objects</span>
         </div>
 
         <div className="service-card-stage">
-          <article className="service-card service-card-graphic" data-card-layer data-base-z="120" data-depth=".85" data-phase="0.2" data-reveal>
+          <article className="service-card service-card-graphic" data-card-layer data-base-z="120" data-depth=".8" data-reveal>
             <span>01</span>
             <h3>Graphic Design</h3>
             <p>Logos, typography, menus, posters, print systems and visual identity.</p>
           </article>
 
-          <article className="service-card service-card-web" data-card-layer data-base-z="125" data-depth="1" data-phase="1.1" data-reveal>
+          <article className="service-card service-card-web" data-card-layer data-base-z="125" data-depth=".95" data-reveal>
             <span>02</span>
             <h3>Web Design</h3>
             <p>Editorial websites, portfolios, landing pages and interaction-led layouts.</p>
           </article>
 
-          <article className="service-card service-card-dev" data-card-layer data-base-z="130" data-depth=".9" data-phase="1.9" data-reveal>
+          <article className="service-card service-card-dev" data-card-layer data-base-z="130" data-depth=".9" data-reveal>
             <span>03</span>
             <h3>Development</h3>
             <p>Next.js builds, dashboards, custom tools, automation and deployment.</p>
           </article>
 
-          <article className="service-card service-card-editorial" data-card-layer data-base-z="115" data-depth=".75" data-phase="2.7" data-reveal>
+          <article className="service-card service-card-editorial" data-card-layer data-base-z="115" data-depth=".75" data-reveal>
             <span>04</span>
             <h3>Editorial</h3>
             <p>Reports, presentations, publications and information design.</p>

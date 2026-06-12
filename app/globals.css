@@ -997,21 +997,21 @@ select {
 
 
 
+
+
 /* =====================================================
-   PHASE 2 MOBILE TOUCH MOTION SYSTEM
-   Extends Phase 1:
-   - sticky-feeling project stack motion
-   - animated background ambience
-   - scroll-reactive menu behavior
-   - text/section reveals
-   - keeps mobile card centering and tap/drag behavior
+   PHASE 2 OPTIMIZED MOBILE MOTION
+   Performance changes:
+   - no continuous requestAnimationFrame loop
+   - no animated blur/filter/letter-spacing
+   - scroll work is throttled to one rAF and only affects project stack/menu
+   - drag only updates the touched card
+   - animation is transform/opacity only
    ===================================================== */
 
 :root{
   --motion-ease:cubic-bezier(.16,1,.3,1);
-  --motion-speed:360ms;
-  --ambient-x:0;
-  --ambient-y:0;
+  --motion-speed:340ms;
 }
 
 html,
@@ -1022,16 +1022,15 @@ body{
 body::before{
   content:"";
   position:fixed;
-  inset:-25%;
+  inset:-18%;
   z-index:0;
   pointer-events:none;
   background:
-    radial-gradient(circle at calc(42% + var(--ambient-x) * 9%) calc(24% + var(--ambient-y) * 8%), rgba(255,255,255,.26), transparent 28%),
-    radial-gradient(circle at calc(20% + var(--ambient-y) * 8%) 54%, rgba(247,163,207,.18), transparent 30%),
-    radial-gradient(circle at calc(82% + var(--ambient-x) * -10%) 70%, rgba(255,222,92,.18), transparent 34%);
-  filter:blur(16px);
-  opacity:.72;
-  transform:translate3d(calc(var(--ambient-x) * 18px), calc(var(--ambient-y) * 18px),0);
+    radial-gradient(circle at 38% 20%, rgba(255,255,255,.22), transparent 28%),
+    radial-gradient(circle at 18% 58%, rgba(247,163,207,.16), transparent 30%),
+    radial-gradient(circle at 84% 72%, rgba(255,222,92,.15), transparent 34%);
+  opacity:.7;
+  transform:translateZ(0);
 }
 
 .site-home{
@@ -1041,10 +1040,7 @@ body::before{
 
 .fixed-menu{
   z-index:10000 !important;
-  transition:
-    opacity 280ms var(--motion-ease),
-    transform 280ms var(--motion-ease),
-    filter 280ms var(--motion-ease) !important;
+  transition:opacity 220ms var(--motion-ease), transform 220ms var(--motion-ease) !important;
 }
 
 .fixed-menu-inner{
@@ -1053,16 +1049,15 @@ body::before{
 }
 
 .fixed-menu.is-scroll-down{
-  opacity:.62;
-  filter:blur(.2px);
+  opacity:.66;
 }
 
 .fixed-menu-header.is-scroll-down{
-  transform:translateY(-8px) scale(.985) !important;
+  transform:translate3d(0,-7px,0) scale(.99) !important;
 }
 
 .fixed-menu-footer.is-scroll-down{
-  transform:translateY(8px) scale(.985) !important;
+  transform:translate3d(0,7px,0) scale(.99) !important;
 }
 
 .hero-card,
@@ -1074,86 +1069,64 @@ body::before{
   transition:
     transform var(--motion-speed) var(--motion-ease),
     box-shadow var(--motion-speed) var(--motion-ease),
-    filter var(--motion-speed) var(--motion-ease),
     opacity var(--motion-speed) var(--motion-ease);
   will-change:transform;
+  backface-visibility:hidden;
 }
 
 .hero-card.is-touching,
 .project-card.is-touching,
 .service-card.is-touching{
-  --touch-scale:.985;
+  --touch-scale:.986;
 }
 
 .hero-card.is-dragging,
 .project-card.is-dragging,
 .service-card.is-dragging{
-  transition:
-    box-shadow 160ms var(--motion-ease),
-    filter 160ms var(--motion-ease),
-    opacity 160ms var(--motion-ease);
+  transition:box-shadow 140ms var(--motion-ease), opacity 140ms var(--motion-ease);
 }
 
 .hero-card.is-front,
 .project-card.is-front,
 .service-card.is-front{
-  --front-scale:1.035;
-  box-shadow:0 50px 135px rgba(0,0,0,.29) !important;
-  filter:saturate(1.1) contrast(1.03);
+  --front-scale:1.026;
+  box-shadow:0 38px 95px rgba(0,0,0,.24) !important;
 }
 
 [data-reveal]{
   opacity:0;
-  filter:blur(8px);
-}
-
-.motion-ready [data-reveal]{
-  animation:phase2Reveal 660ms var(--motion-ease) forwards;
-  animation-delay:var(--reveal-delay,0ms);
+  transform:translate3d(0,14px,0);
 }
 
 .motion-ready [data-reveal].is-visible{
-  opacity:1;
+  animation:optimizedReveal 520ms var(--motion-ease) forwards;
+  animation-delay:var(--reveal-delay,0ms);
 }
 
-/* Text motion */
-.section-heading,
-.background-word,
-.hero-title,
-.about-copy{
-  transform:translate3d(0, calc((1 - var(--stack-progress, 1)) * 8px), 0);
-}
-
-.background-word{
-  animation:phase2WordDrift 8s ease-in-out infinite alternate;
-}
-
-/* Desktop/tablet composition with motion variables */
+/* Desktop/tablet: keep original collage but integrate touch motion */
 .hero-card-main{
   transform:
-    translateX(calc(-42% + var(--float-x,0px) + var(--drag-x,0px)))
-    translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+    translateX(calc(-42% + var(--drag-x,0px)))
+    translateY(var(--drag-y,0px))
     rotate(3deg)
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-strategy{
   transform:
-    translateX(calc(var(--float-x,0px) + var(--drag-x,0px)))
-    translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+    translate3d(var(--drag-x,0px), var(--drag-y,0px), 0)
     rotate(-5deg)
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-profile{
   transform:
-    translateX(calc(var(--float-x,0px) + var(--drag-x,0px)))
-    translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+    translate3d(var(--drag-x,0px), var(--drag-y,0px), 0)
     rotate(-4deg)
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
-/* MOBILE: centered, touchscreen-first composition */
+/* MOBILE: stable centered composition */
 @media(max-width:900px){
   :root{
     --menu-size:16px;
@@ -1181,8 +1154,8 @@ body::before{
     min-height:455px !important;
     padding:18px 18px 34px !important;
     transform:
-      translateX(calc(-50% + var(--float-x,0px) + var(--drag-x,0px)))
-      translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+      translateX(calc(-50% + var(--drag-x,0px)))
+      translateY(var(--drag-y,0px))
       rotate(3deg)
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
@@ -1196,8 +1169,8 @@ body::before{
     min-height:225px !important;
     padding:18px !important;
     transform:
-      translateX(calc(-76% + var(--float-x,0px) + var(--drag-x,0px)))
-      translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+      translateX(calc(-76% + var(--drag-x,0px)))
+      translateY(var(--drag-y,0px))
       rotate(-5deg)
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
@@ -1210,23 +1183,16 @@ body::before{
     max-width:250px !important;
     min-height:370px !important;
     padding:20px 16px !important;
-    z-index:14;
     transform:
-      translateX(calc(-22% + var(--float-x,0px) + var(--drag-x,0px)))
-      translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+      translateX(calc(-22% + var(--drag-x,0px)))
+      translateY(var(--drag-y,0px))
       rotate(-4deg)
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
-  .hero-card.is-front{
-    --front-scale:1.028;
-  }
-
-  /* Sticky-feeling project stack */
   .project-card-stage{
     min-height:1260px !important;
-    perspective:1000px;
-    transform-style:preserve-3d;
+    perspective:900px;
   }
 
   .project-card{
@@ -1236,8 +1202,8 @@ body::before{
     max-width:360px !important;
     opacity:var(--stack-opacity, 1);
     transform:
-      translateX(calc(-50% + var(--float-x,0px) + var(--drag-x,0px)))
-      translateY(calc(var(--stack-y,0px) + var(--float-y,0px) + var(--drag-y,0px)))
+      translateX(calc(-50% + var(--drag-x,0px)))
+      translateY(calc(var(--stack-y,0px) + var(--drag-y,0px)))
       rotate(var(--card-r,0deg))
       scale(calc(var(--stack-scale,1) * var(--touch-scale, var(--front-scale, 1)))) !important;
   }
@@ -1258,8 +1224,8 @@ body::before{
     width:84vw !important;
     max-width:360px !important;
     transform:
-      translateX(calc(-50% + var(--float-x,0px) + var(--drag-x,0px)))
-      translateY(calc(var(--float-y,0px) + var(--drag-y,0px)))
+      translateX(calc(-50% + var(--drag-x,0px)))
+      translateY(var(--drag-y,0px))
       rotate(var(--card-r,0deg))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
@@ -1270,7 +1236,6 @@ body::before{
   .service-card-editorial{top:650px !important; --card-r:2deg;}
 }
 
-/* Desktop/fallback rotation variables */
 .project-card-1,
 .service-card-graphic{--card-r:-3deg;}
 .project-card-2,
@@ -1281,27 +1246,10 @@ body::before{
 .project-card-5,
 .service-card-editorial{--card-r:3deg;}
 
-@keyframes phase2Reveal{
-  from{
-    opacity:0;
-    filter:blur(8px);
-    transform:translateY(18px);
-  }
+@keyframes optimizedReveal{
   to{
     opacity:1;
-    filter:blur(0);
-    transform:translateY(0);
-  }
-}
-
-@keyframes phase2WordDrift{
-  from{
-    letter-spacing:-.13em;
-    opacity:.36;
-  }
-  to{
-    letter-spacing:-.08em;
-    opacity:.52;
+    transform:translate3d(0,0,0);
   }
 }
 
