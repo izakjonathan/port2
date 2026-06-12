@@ -257,11 +257,18 @@ export default function Home() {
           <Link href="/projects">Archive</Link>
         </div>
 
-        <div className="project-card-stage" data-project-stack data-project-stack>
+        <div className="project-card-stage" data-project-stack>
           {projects.map((project, index) => (
             <Link
+              key={project.slug}
               href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1}`} data-card-layer data-stack-card data-base-z={90 + index} data-depth={0.7 + index * 0.08} data-reveal>
+              className={`project-card project-card-${index + 1}`}
+              data-card-layer
+              data-stack-card
+              data-base-z={90 + index}
+              data-depth={0.7 + index * 0.08}
+              data-reveal
+            >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
