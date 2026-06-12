@@ -9,6 +9,7 @@ export default function Home() {
   const activeCardRef = useRef(null);
   const dragFrameRef = useRef(null);
   const scrollFrameRef = useRef(null);
+  const liftTimersRef = useRef([]);
 
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
@@ -32,9 +33,14 @@ export default function Home() {
 
     const bringToFront = (card) => {
       resetCardLayers();
-      card.classList.add("is-front");
+      card.classList.add("is-front", "is-lift-pop");
       card.style.setProperty("--z", "900");
       activeCardRef.current = card;
+
+      const timer = window.setTimeout(() => {
+        card.classList.remove("is-lift-pop");
+      }, 260);
+      liftTimersRef.current.push(timer);
     };
 
     const setDragVars = (card, x, y) => {
@@ -43,8 +49,13 @@ export default function Home() {
     };
 
     const clearDrag = (card) => {
-      card.classList.remove("is-touching", "is-dragging");
+      card.classList.remove("is-dragging");
+      card.classList.add("is-releasing");
       setDragVars(card, 0, 0);
+
+      window.setTimeout(() => {
+        card.classList.remove("is-touching", "is-releasing");
+      }, 180);
     };
 
     const updateScrollMotion = () => {
@@ -113,8 +124,14 @@ export default function Home() {
       }, true);
 
       card.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+
+        const rect = card.getBoundingClientRect();
         card.dataset.didDrag = "false";
+        card.classList.remove("is-releasing");
         card.classList.add("is-touching");
+        card.style.setProperty("--tap-x", `${event.clientX - rect.left}px`);
+        card.style.setProperty("--tap-y", `${event.clientY - rect.top}px`);
 
         currentDrag = {
           card,
@@ -137,7 +154,7 @@ export default function Home() {
         const dx = event.clientX - currentDrag.startX;
         const dy = event.clientY - currentDrag.startY;
 
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
           card.dataset.didDrag = "true";
           card.classList.add("is-dragging");
 
@@ -147,8 +164,8 @@ export default function Home() {
           }
         }
 
-        currentDrag.nextX = Math.max(-34, Math.min(34, dx * 0.26));
-        currentDrag.nextY = Math.max(-26, Math.min(26, dy * 0.2));
+        currentDrag.nextX = Math.max(-30, Math.min(30, dx * 0.22));
+        currentDrag.nextY = Math.max(-24, Math.min(24, dy * 0.18));
 
         if (!dragFrameRef.current) {
           dragFrameRef.current = requestAnimationFrame(() => {
@@ -197,6 +214,8 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       observer.disconnect();
+      liftTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      liftTimersRef.current = [];
       if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
     };

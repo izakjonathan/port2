@@ -1,0 +1,31 @@
+Build: portfolio-reference-collage-v16-mobile-motion-polish.zip
+Baseline: portfolio-reference-collage-v15-animation-stability-fix.zip
+Date: 2026-06-12
+
+Scope:
+- Mobile motion polish only.
+- Kept v15 animation stability fixes intact.
+- Kept the optimized motion block as the single source of truth.
+- No content, layout structure, routing, or framework changes.
+
+Changes:
+- Added smoother front-card lift feedback using a short is-lift-pop state.
+- Added smoother drag release using an is-releasing state.
+- Reduced drag resistance/side movement so cards feel steadier on touch.
+- Increased drag threshold from 5px to 8px to avoid accidental drag activation on taps.
+- Added tap-origin highlight feedback on cards without changing their layout transforms.
+- Added subtle active feedback to fixed menu links.
+- Consolidated motion variables inside the optimized motion block only.
+
+Build test:
+- npm ci
+- npm run build
+
+Result:
+- Build successful with Next.js 15.5.18.
+- Generated 5 static/dynamic routes successfully.
+
+Notes:
+- npm audit still reports 2 moderate advisories through the Next/PostCSS chain.
+- Did not run npm audit fix --force because it proposes breaking/undesirable dependency changes.
+- Placeholder case-study images are still intentionally left for a later content/image pass.
