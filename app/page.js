@@ -113,7 +113,6 @@ export default function Home() {
       }, true);
 
       card.addEventListener("pointerdown", (event) => {
-        bringToFront(card);
         card.dataset.didDrag = "false";
         card.classList.add("is-touching");
 
@@ -124,6 +123,7 @@ export default function Home() {
           startY: event.clientY,
           nextX: 0,
           nextY: 0,
+          hasMoved: false,
         };
 
         try {
@@ -140,6 +140,11 @@ export default function Home() {
         if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
           card.dataset.didDrag = "true";
           card.classList.add("is-dragging");
+
+          if (!currentDrag.hasMoved) {
+            currentDrag.hasMoved = true;
+            bringToFront(card);
+          }
         }
 
         currentDrag.nextX = Math.max(-34, Math.min(34, dx * 0.26));

@@ -1,0 +1,32 @@
+Build: portfolio-reference-collage-v15-animation-stability-fix
+Base: portfolio-reference-collage-v14-next15-security-upgrade
+Date: 2026-06-12
+
+Purpose:
+- Fix broken card motion after the Next 15 upgrade/animation cleanup.
+- Stop project/hero/service cards from jumping sideways during reveal/scroll.
+- Make first tap bring a card forward only; second tap opens linked project cards.
+- Prevent simple taps on main cards from being treated like drag movement.
+
+Changes:
+1. app/globals.css
+   - Reveal animation no longer animates transform on elements with data-card-layer.
+   - Card layers keep their own transform formulas for layout, drag, scale, rotation and stack movement.
+   - Non-card reveal elements still use the optimized reveal animation.
+   - Added an explicit guard so card-layer reveal never applies transform animation.
+
+2. app/page.js
+   - Removed bringToFront() from pointerdown.
+   - Cards are now brought to front on first tap through the click gate, or when a real drag starts.
+   - Drag only begins after movement passes the threshold.
+   - First tap on linked project cards is prevented and used only to bring the card forward.
+   - Second tap on the same card opens the project.
+
+Build check:
+- npm ci completed
+- npm run build completed successfully on Next 15.5.18
+
+Notes:
+- No visual redesign was made.
+- No placeholder images were replaced.
+- The optimized motion block remains the single source of truth.
