@@ -1,0 +1,29 @@
+Build: portfolio-reference-collage-v19-mobile-visual-polish.zip
+Base: portfolio-reference-collage-v18-ios-link-preview-fix.zip
+
+Scope:
+- Visual-only mobile polish.
+- No framework upgrades.
+- No routing changes.
+- No project card interaction logic changes.
+- No changes to the v16/v18 transform formulas that control card motion.
+
+Changes:
+- Added mobile translucent menu backplates for readability.
+- Slightly refined mobile background atmosphere.
+- Added subtle card borders/shadow refinement.
+- Improved project/service card internal spacing.
+- Added small number pill styling on mobile cards.
+- Improved mobile about-section layout.
+- Kept iOS long-press text-selection/link-preview fixes intact.
+
+Build command:
+npm run build
+
+Result:
+npm run build completed successfully.
+✓ Compiled successfully
+✓ Generating static pages (5/5)
+
+Notes:
+- npm install reported 2 moderate audit advisories inherited through the current Next dependency tree. No forced audit fix was applied because this build is intentionally visual-only.
