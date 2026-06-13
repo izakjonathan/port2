@@ -9,7 +9,7 @@ export default function Home() {
   const activeCardRef = useRef(null);
   const dragFrameRef = useRef(null);
   const scrollFrameRef = useRef(null);
-  const heroFrameRef = useRef(null);
+  const paraFrameRef = useRef(null);
   const liftTimersRef = useRef([]);
 
   useEffect(() => {
@@ -21,10 +21,14 @@ export default function Home() {
       ? Array.from(projectStack.querySelectorAll("[data-stack-card]"))
       : [];
     const menuNodes = Array.from(document.querySelectorAll(".fixed-menu"));
+    const heroSection = document.querySelector(".home-hero");
+
     let currentDrag = null;
     let lastScrollY = window.scrollY;
     let lastTapAt = 0;
-    let heroMotionEnabled = true;
+    let heroMouseX = 0;
+    let heroMouseY = 0;
+    let isHeroHovered = false;
 
     // ── Hero entrance ──────────────────────────────────────────────
     // Cards start invisible (CSS sets opacity:0 before motion-ready).
@@ -113,103 +117,71 @@ export default function Home() {
       }
     };
 
-    // ── Unified hero motion: idle float + scroll parallax ───────────
-    // This is the only continuous motion system for the three main hero cards.
-    // The CSS transforms read --hero-x / --hero-y / --hero-r on both desktop
-    // and mobile, so the values below are visible on iPhone as well.
-    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const heroMotionProfiles = [
-      { idleX: 5.5, idleY: 4.5, idleR: 0.55, scrollX: 34, scrollY: 30, scrollR: 3.2, speed: 0.42, phase: 0 },
-      { idleX: -4.8, idleY: 3.8, idleR: -0.5, scrollX: -42, scrollY: -24, scrollR: -4.1, speed: 0.37, phase: 2.15 },
-      { idleX: 4.2, idleY: -5.2, idleR: 0.48, scrollX: 28, scrollY: 38, scrollR: 2.7, speed: 0.34, phase: 4.3 },
-    ];
+    // ── Mouse parallax (desktop hero only) ────────────────────────
+    const updateParallax = () => {
+      paraFrameRef.current = null;
+      if (!isHeroHovered) return;
 
-    const resetHeroMotionVars = () => {
       heroCards.forEach((card) => {
-        card.style.setProperty("--hero-x", "0px");
-        card.style.setProperty("--hero-y", "0px");
-        card.style.setProperty("--hero-r", "0deg");
+        if (currentDrag?.card === card) return; // skip card being dragged
+
+        const depth = parseFloat(card.dataset.depth || "1");
+        const rect = card.getBoundingClientRect();
+        const cardCx = rect.left + rect.width / 2;
+        const cardCy = rect.top + rect.height / 2;
+
+        // Offset from card centre, scaled by depth, capped gently
+        const dx = Math.max(-22, Math.min(22, (heroMouseX - cardCx) * 0.028 * depth));
+        const dy = Math.max(-16, Math.min(16, (heroMouseY - cardCy) * 0.022 * depth));
+
+        // Tilt: opposite direction to offset (card faces cursor)
+        const tiltX = Math.max(-5, Math.min(5, -(heroMouseY - cardCy) * 0.006 * depth));
+        const tiltY = Math.max(-6, Math.min(6,  (heroMouseX - cardCx) * 0.006 * depth));
+
+        card.style.setProperty("--para-x", `${dx.toFixed(2)}px`);
+        card.style.setProperty("--para-y", `${dy.toFixed(2)}px`);
+        card.style.setProperty("--para-rx", `${tiltX.toFixed(2)}deg`);
+        card.style.setProperty("--para-ry", `${tiltY.toFixed(2)}deg`);
       });
     };
 
-    const runHeroMotion = (timestamp = 0) => {
-      if (!heroMotionEnabled || reduceMotionQuery.matches || document.hidden) {
-        heroFrameRef.current = null;
-        return;
+    const requestParallax = () => {
+      if (!paraFrameRef.current) {
+        paraFrameRef.current = requestAnimationFrame(updateParallax);
       }
+    };
 
-      const time = timestamp / 1000;
-      const viewportH = Math.max(window.innerHeight || 1, 1);
-      const scrollProgress = Math.max(0, Math.min(1.25, window.scrollY / viewportH));
-
-      heroCards.forEach((card, index) => {
-        if (currentDrag?.card === card) return;
-
-        const profile = heroMotionProfiles[index] || heroMotionProfiles[0];
-        const depth = Number(card.dataset.depth || 1);
-        const waveA = Math.sin(time * profile.speed + profile.phase);
-        const waveB = Math.cos(time * (profile.speed * 0.72) + profile.phase);
-
-        const x = (profile.idleX * waveA + profile.scrollX * scrollProgress) * depth;
-        const y = (profile.idleY * waveB + profile.scrollY * scrollProgress) * depth;
-        const r = (profile.idleR * waveA + profile.scrollR * scrollProgress) * depth;
-
-        card.style.setProperty("--hero-x", `${x.toFixed(2)}px`);
-        card.style.setProperty("--hero-y", `${y.toFixed(2)}px`);
-        card.style.setProperty("--hero-r", `${r.toFixed(2)}deg`);
+    const clearParallax = () => {
+      heroCards.forEach((card) => {
+        card.style.setProperty("--para-x", "0px");
+        card.style.setProperty("--para-y", "0px");
+        card.style.setProperty("--para-rx", "0deg");
+        card.style.setProperty("--para-ry", "0deg");
       });
-
-      heroFrameRef.current = requestAnimationFrame(runHeroMotion);
     };
 
-    const startHeroMotion = () => {
-      if (heroFrameRef.current || reduceMotionQuery.matches || document.hidden) return;
-      heroMotionEnabled = true;
-      heroFrameRef.current = requestAnimationFrame(runHeroMotion);
+    const onHeroMouseMove = (event) => {
+      heroMouseX = event.clientX;
+      heroMouseY = event.clientY;
+      isHeroHovered = true;
+      requestParallax();
     };
 
-    const stopHeroMotion = (reset = false) => {
-      heroMotionEnabled = false;
-      if (heroFrameRef.current) cancelAnimationFrame(heroFrameRef.current);
-      heroFrameRef.current = null;
-      if (reset) resetHeroMotionVars();
+    const onHeroMouseLeave = () => {
+      isHeroHovered = false;
+      clearParallax();
     };
 
-    const handleReducedMotionChange = () => {
-      if (reduceMotionQuery.matches) {
-        stopHeroMotion(true);
-      } else {
-        heroMotionEnabled = true;
-        startHeroMotion();
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        stopHeroMotion(false);
-      } else if (!reduceMotionQuery.matches) {
-        heroMotionEnabled = true;
-        startHeroMotion();
-      }
-    };
-
-    if (typeof reduceMotionQuery.addEventListener === "function") {
-      reduceMotionQuery.addEventListener("change", handleReducedMotionChange);
-    } else if (typeof reduceMotionQuery.addListener === "function") {
-      reduceMotionQuery.addListener(handleReducedMotionChange);
+    if (heroSection) {
+      heroSection.addEventListener("mousemove", onHeroMouseMove, { passive: true });
+      heroSection.addEventListener("mouseleave", onHeroMouseLeave);
     }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // ── Card event listeners ───────────────────────────────────────
     cards.forEach((card, index) => {
       card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
       card.style.setProperty("--drag-x", "0px");
       card.style.setProperty("--drag-y", "0px");
-      // Initialise unified hero offsets; para offsets remain for legacy transforms
-      card.style.setProperty("--hero-x", "0px");
-      card.style.setProperty("--hero-y", "0px");
-      card.style.setProperty("--hero-r", "0deg");
       card.style.setProperty("--para-x", "0px");
       card.style.setProperty("--para-y", "0px");
       card.style.setProperty("--para-rx", "0deg");
@@ -356,23 +328,20 @@ export default function Home() {
     window.addEventListener("scroll", requestScrollMotion, { passive: true });
     document.body.classList.add("motion-ready");
     requestScrollMotion();
-    startHeroMotion();
 
     return () => {
       window.removeEventListener("scroll", requestScrollMotion);
       observer.disconnect();
+      if (heroSection) {
+        heroSection.removeEventListener("mousemove", onHeroMouseMove);
+        heroSection.removeEventListener("mouseleave", onHeroMouseLeave);
+      }
       entranceTimers.forEach((t) => window.clearTimeout(t));
       liftTimersRef.current.forEach((t) => window.clearTimeout(t));
       liftTimersRef.current = [];
       if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
-      stopHeroMotion(false);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      if (typeof reduceMotionQuery.removeEventListener === "function") {
-        reduceMotionQuery.removeEventListener("change", handleReducedMotionChange);
-      } else if (typeof reduceMotionQuery.removeListener === "function") {
-        reduceMotionQuery.removeListener(handleReducedMotionChange);
-      }
+      if (paraFrameRef.current) cancelAnimationFrame(paraFrameRef.current);
     };
   }, []);
 
