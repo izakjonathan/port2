@@ -1842,3 +1842,121 @@ body::before{
     border-radius: 18px;
   }
 }
+
+/* =====================================================
+   V22 CLEAN MERGE: restored V21 accessibility/performance safeguards.
+   Keeps the V22 creative direction while preserving the stable baseline rules.
+   ===================================================== */
+
+.skip-link {
+  position: fixed;
+  left: 14px;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  z-index: 1000000;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--black);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  transform: translate3d(0, -180%, 0);
+  transition: transform 180ms var(--motion-ease);
+}
+
+.skip-link:focus-visible {
+  transform: translate3d(0, 0, 0);
+  outline: 2px solid rgba(255, 255, 255, 0.92);
+  outline-offset: 3px;
+}
+
+main:focus {
+  outline: none;
+}
+
+a:focus-visible,
+[role="link"]:focus-visible {
+  outline: 2px solid rgba(5, 5, 5, 0.82);
+  outline-offset: 5px;
+  border-radius: 12px;
+}
+
+.fixed-menu-link:focus-visible {
+  outline-offset: 6px;
+  background: rgba(251, 250, 245, 0.55);
+}
+
+.project-card:focus-visible,
+.hero-card:focus-visible,
+.service-card:focus-visible {
+  outline: 2px solid rgba(5, 5, 5, 0.82);
+  outline-offset: 6px;
+}
+
+.case-copy-card,
+.case-split,
+.case-gallery,
+.case-wide-copy,
+.archive-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 520px;
+}
+
+.case-media-frame img,
+.profile-dot,
+.level-ring,
+.hero-card img,
+.project-card img,
+.service-card img {
+  -webkit-user-drag: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fixed-menu-link:hover {
+    opacity: 0.68;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  [data-reveal],
+  [data-reveal]:not([data-card-layer]) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .motion-ready .hero-card,
+  .motion-ready .hero-card:not(.is-hero-entered),
+  .motion-ready .hero-card.is-hero-entered {
+    opacity: 1 !important;
+    pointer-events: auto;
+    --enter-active: 0;
+    --para-x: 0px;
+    --para-y: 0px;
+    --para-rx: 0deg;
+    --para-ry: 0deg;
+  }
+
+  .fixed-menu.is-scroll-down,
+  .fixed-menu-header.is-scroll-down,
+  .fixed-menu-footer.is-scroll-down {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .project-card {
+    opacity: 1 !important;
+  }
+}

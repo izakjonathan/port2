@@ -26,6 +26,7 @@ export default function Home() {
     let currentDrag = null;
     let lastScrollY = window.scrollY;
     let lastTapAt = 0;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let heroMouseX = 0;
     let heroMouseY = 0;
     let isHeroHovered = false;
@@ -35,6 +36,11 @@ export default function Home() {
     // Stagger each hero card entrance with a direction-aware class.
     const entranceTimers = [];
     heroCards.forEach((card, i) => {
+      if (prefersReducedMotion) {
+        card.classList.add("is-hero-entered");
+        return;
+      }
+
       const delay = 120 + i * 110;
       const t = window.setTimeout(() => {
         card.classList.add("is-hero-entered");
@@ -85,11 +91,13 @@ export default function Home() {
       const scrollingDown = scrollY > lastScrollY && scrollY > 72;
       lastScrollY = scrollY;
 
-      menuNodes.forEach((menu) => {
-        menu.classList.toggle("is-scroll-down", scrollingDown);
-      });
+      if (!prefersReducedMotion) {
+        menuNodes.forEach((menu) => {
+          menu.classList.toggle("is-scroll-down", scrollingDown);
+        });
+      }
 
-      if (projectStack && projectCards.length) {
+      if (!prefersReducedMotion && projectStack && projectCards.length) {
         const rect = projectStack.getBoundingClientRect();
         const viewportHeight = window.innerHeight || 1;
         const progress = Math.max(
@@ -146,6 +154,7 @@ export default function Home() {
     };
 
     const requestParallax = () => {
+      if (prefersReducedMotion) return;
       if (!paraFrameRef.current) {
         paraFrameRef.current = requestAnimationFrame(updateParallax);
       }
@@ -172,7 +181,7 @@ export default function Home() {
       clearParallax();
     };
 
-    if (heroSection) {
+    if (!prefersReducedMotion && heroSection) {
       heroSection.addEventListener("mousemove", onHeroMouseMove, { passive: true });
       heroSection.addEventListener("mouseleave", onHeroMouseLeave);
     }
@@ -283,9 +292,8 @@ export default function Home() {
           }
         }
 
-        // Increased resistance factor: feels more 1:1 now
-        currentDrag.nextX = Math.max(-38, Math.min(38, dx * 0.34));
-        currentDrag.nextY = Math.max(-30, Math.min(30, dy * 0.28));
+        currentDrag.nextX = Math.max(-30, Math.min(30, dx * 0.22));
+        currentDrag.nextY = Math.max(-24, Math.min(24, dy * 0.18));
 
         if (!dragFrameRef.current) {
           dragFrameRef.current = requestAnimationFrame(() => {
@@ -310,29 +318,39 @@ export default function Home() {
     });
 
     // ── Scroll reveal ──────────────────────────────────────────────
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+    let observer = null;
 
-    revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${Math.min(index * 45, 260)}ms`);
-      observer.observe(item);
-    });
+    if (prefersReducedMotion) {
+      revealItems.forEach((item) => {
+        item.classList.add("is-visible");
+      });
+    } else {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+
+      revealItems.forEach((item, index) => {
+        item.style.setProperty("--reveal-delay", `${Math.min(index * 45, 260)}ms`);
+        observer.observe(item);
+      });
+    }
 
     // ── Boot ───────────────────────────────────────────────────────
-    window.addEventListener("scroll", requestScrollMotion, { passive: true });
+    if (!prefersReducedMotion) {
+      window.addEventListener("scroll", requestScrollMotion, { passive: true });
+      requestScrollMotion();
+    }
     document.body.classList.add("motion-ready");
-    requestScrollMotion();
 
     return () => {
       window.removeEventListener("scroll", requestScrollMotion);
-      observer.disconnect();
-      if (heroSection) {
+      if (observer) observer.disconnect();
+      if (!prefersReducedMotion && heroSection) {
         heroSection.removeEventListener("mousemove", onHeroMouseMove);
         heroSection.removeEventListener("mouseleave", onHeroMouseLeave);
       }
@@ -346,7 +364,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="site-home">
+    <main id="main-content" className="site-home" tabIndex="-1">
       <section className="home-hero" aria-label="Portfolio introduction">
         <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1" data-reveal>
           <div className="hero-card-meta">
@@ -393,11 +411,11 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="work-section" data-reveal id="case-studies">
+      <section className="work-section" data-reveal id="case-studies" aria-labelledby="case-studies-heading">
         <div className="background-word" data-reveal>WORK</div>
         <div className="section-heading" data-reveal>
           <span>01</span>
-          <h2>Case Studies</h2>
+          <h2 id="case-studies-heading">Case Studies</h2>
           <Link href="/projects">Archive</Link>
         </div>
 
@@ -428,11 +446,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="services-section" data-reveal id="services">
+      <section className="services-section" data-reveal id="services" aria-labelledby="services-heading">
         <div className="background-word" data-reveal>SERVICES</div>
         <div className="section-heading" data-reveal>
           <span>02</span>
-          <h2>Services</h2>
+          <h2 id="services-heading">Services</h2>
           <span>Available</span>
         </div>
 
@@ -463,7 +481,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="about-section" data-reveal id="about">
+      <section className="about-section" data-reveal id="about" aria-label="Profile">
         <span>03 / Profile</span>
         <p>
           Visual systems, mobile-first web apps and editorial interfaces — made with care for typography, motion and the details that separate something finished from something done.

@@ -11,8 +11,18 @@ export const viewport = {
 };
 
 export const metadata = {
-  title: "Izak Hyllested",
+  title: {
+    default: "Izak Hyllested",
+    template: "%s | Izak Hyllested",
+  },
   description: "Portfolio, graphic design and creative development",
+  applicationName: "Izak Hyllested Portfolio",
+  creator: "Izak Hyllested",
+  authors: [{ name: "Izak Hyllested" }],
+  robots: {
+    index: true,
+    follow: true,
+  },
   appleWebApp: {
     capable: true,
     title: "Izak Hyllested",
@@ -43,6 +53,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <a className="skip-link" href="#main-content">Skip to content</a>
         <Nav />
         {children}
       </body>

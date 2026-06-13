@@ -72,11 +72,11 @@ export default async function ProjectPage({ params }) {
   const nextProject = caseStudies[nextSlug];
 
   return (
-    <main className="case-study">
-      <section className="case-hero case-panel">
+    <main id="main-content" className="case-study" tabIndex="-1">
+      <section className="case-hero case-panel" aria-labelledby="case-study-title">
         <div className="case-hero-copy">
           <div className="case-kicker">{project.status}</div>
-          <h1>{project.title}</h1>
+          <h1 id="case-study-title">{project.title}</h1>
           <p className="case-subtitle">{project.subtitle}</p>
         </div>
 
