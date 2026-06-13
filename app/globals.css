@@ -115,6 +115,14 @@ select {
   line-height: 1;
   letter-spacing: -0.045em;
   font-weight: 400;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fixed-menu-link:hover {
+    opacity: 0.54;
+    transform: scale(0.97);
+  }
 }
 
 .fixed-menu-brand {
@@ -420,6 +428,27 @@ select {
   letter-spacing: 0.08em;
 }
 
+.project-card > span:first-child,
+.service-card > span:first-child {
+  display: inline-flex;
+  width: fit-content;
+  min-width: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.project-card-2 > span:first-child,
+.service-card-dev > span:first-child {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .project-card-1 {
   left: 4vw;
   top: 15px;
@@ -549,6 +578,14 @@ select {
   color: var(--muted);
   font-size: clamp(20px, 2.2vw, 34px);
   letter-spacing: -0.06em;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .about-section a:hover {
+    opacity: 0.5;
+    transform: translateX(4px);
+  }
 }
 
 .about-section p {
@@ -1035,6 +1072,26 @@ body::before{
     radial-gradient(circle at 84% 72%, rgba(255,222,92,.15), transparent 34%);
   opacity:.7;
   transform:translateZ(0);
+  animation:ambientDrift 28s ease-in-out infinite alternate;
+}
+
+@keyframes ambientDrift{
+  0%{
+    background-position:0% 0%;
+    transform:translateZ(0) scale(1);
+  }
+  33%{
+    background-position:3% 5%;
+    transform:translateZ(0) scale(1.022) translateX(8px) translateY(6px);
+  }
+  66%{
+    background-position:-4% 3%;
+    transform:translateZ(0) scale(1.018) translateX(-10px) translateY(4px);
+  }
+  100%{
+    background-position:5% -4%;
+    transform:translateZ(0) scale(1.03) translateX(5px) translateY(-8px);
+  }
 }
 
 .site-home{
@@ -1241,31 +1298,37 @@ body::before{
    offset dissolves away as part of the opacity transition. */
 .hero-card-main{
   transform:
-    translateX(calc(-42% + var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
-    translateY(calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
-    rotate(calc(3deg + var(--hero-r, 0deg)))
+    translateX(calc(-42% + var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
+    translateY(calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
+    rotate(3deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-strategy{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(calc(-5deg + var(--hero-r, 0deg)))
+    rotate(-5deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-profile{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(calc(-4deg + var(--hero-r, 0deg)))
+    rotate(-4deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
@@ -1417,7 +1480,76 @@ body::before{
 }
 
 /* =====================================================
-   V19 MOBILE VISUAL POLISH
+   CASE STUDY PAGE ENTRANCE
+   layout.js adds site-ready to <html> on all non-home paths.
+   Stagger children of .case-study for a clean load-in.
+   ===================================================== */
+
+.site-ready .case-study .case-hero.case-panel{
+  animation: caseEnter 680ms var(--motion-pop) both;
+  animation-delay: 60ms;
+}
+
+.site-ready .case-study .case-showcase{
+  animation: caseEnter 680ms var(--motion-pop) both;
+  animation-delay: 160ms;
+}
+
+.site-ready .case-study .case-split:nth-of-type(1){
+  animation: caseEnter 620ms var(--motion-ease) both;
+  animation-delay: 200ms;
+}
+
+.site-ready .case-study .case-split:nth-of-type(2){
+  animation: caseEnter 620ms var(--motion-ease) both;
+  animation-delay: 240ms;
+}
+
+@keyframes caseEnter{
+  from{
+    opacity:0;
+    transform:translate3d(0, 18px, 0);
+  }
+  to{
+    opacity:1;
+    transform:translate3d(0, 0, 0);
+  }
+}
+
+/* Archive page entrance */
+.site-ready .archive-hero{
+  animation: caseEnter 640ms var(--motion-pop) both;
+  animation-delay: 40ms;
+}
+
+.site-ready .archive-list .archive-row{
+  animation: caseEnter 560ms var(--motion-ease) both;
+}
+
+.site-ready .archive-list .archive-row:nth-child(1){ animation-delay: 100ms; }
+.site-ready .archive-list .archive-row:nth-child(2){ animation-delay: 155ms; }
+.site-ready .archive-list .archive-row:nth-child(3){ animation-delay: 210ms; }
+.site-ready .archive-list .archive-row:nth-child(4){ animation-delay: 265ms; }
+.site-ready .archive-list .archive-row:nth-child(5){ animation-delay: 320ms; }
+.site-ready .archive-list .archive-row:nth-child(n+6){ animation-delay: 370ms; }
+
+/* =====================================================
+   DESKTOP PROJECT + SERVICE CARD SCROLL REVEAL
+   Cards have data-card-layer so the default optimizedReveal
+   is suppressed. Give them an opacity-only fade on desktop.
+   ===================================================== */
+
+@media(min-width:901px){
+  .motion-ready [data-card-layer].is-visible{
+    animation: cardFadeIn 480ms var(--motion-ease) forwards !important;
+    animation-delay: var(--reveal-delay, 0ms) !important;
+  }
+
+  @keyframes cardFadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+}
    Visual-only refinements. No card transform rules here.
    Keeps the v18 Safari interaction fixes and v16 motion formulas intact.
    ===================================================== */
@@ -1695,6 +1827,7 @@ body::before{
   font-size: clamp(46px, 7vw, 96px);
   line-height: 0.8;
   letter-spacing: -0.08em;
+  transition: transform 220ms var(--motion-ease), opacity 220ms var(--motion-ease);
 }
 
 .case-nav a:first-child::after {
@@ -1713,7 +1846,7 @@ body::before{
 }
 
 .archive-row {
-  transition: padding 220ms var(--motion-ease), background 220ms var(--motion-ease), border-color 220ms var(--motion-ease);
+  transition: padding 220ms var(--motion-ease), background 220ms var(--motion-ease), border-color 220ms var(--motion-ease), transform 220ms var(--motion-ease);
 }
 
 .archive-row:active {
@@ -1726,9 +1859,26 @@ body::before{
     background: rgba(255, 255, 255, 0.26);
   }
 
+  .archive-row:hover {
+    transform: translateX(8px);
+  }
+
+  .archive-row:hover .archive-main h2::after {
+    content: " →";
+    opacity: 0.28;
+  }
+
   .case-nav a:hover {
     transform: translate3d(0, -3px, 0);
     box-shadow: 0 34px 90px rgba(0, 0, 0, 0.12);
+  }
+
+  .case-nav a:first-child:hover::after {
+    transform: translateX(-4px);
+  }
+
+  .case-nav a:last-child:hover::after {
+    transform: translateX(4px);
   }
 }
 
