@@ -1,0 +1,8 @@
+{
+  "source": "/mnt/data/portfolio-reference-collage-phase1-mobile-motion.zip",
+  "phase2_block": true,
+  "phase1_removed": true,
+  "project_stack_attr": true,
+  "stack_card_attr": true,
+  "hero_cards_data": true
+}

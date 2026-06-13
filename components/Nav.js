@@ -8,9 +8,9 @@ export default function Nav() {
           <Link href="/" className="fixed-menu-link fixed-menu-brand">
             IZAK HYLLESTED
           </Link>
-          <Link href="/#about" className="fixed-menu-link">
+          <a href="#about" className="fixed-menu-link">
             ABOUT
-          </Link>
+          </a>
         </div>
       </header>
 

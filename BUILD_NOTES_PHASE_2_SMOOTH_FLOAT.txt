@@ -1,0 +1,8 @@
+{
+  "source": "/mnt/data/portfolio-reference-collage-phase2-optimized-motion.zip",
+  "old_optimized_block_removed": true,
+  "smooth_block_count": 1,
+  "reveal_transform_not_global_on_cards": true,
+  "uses_typed_float_properties": true,
+  "has_hero_motion_data": true
+}
