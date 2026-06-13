@@ -136,6 +136,8 @@ select {
   min-height: 100svh;
   overflow: hidden;
   background: var(--bg);
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
 }
 
 .hero-card {
@@ -1100,33 +1102,47 @@ body::before{
 .hero-card.is-touching,
 .project-card.is-touching,
 .service-card.is-touching{
-  --touch-scale:.992;
+  --touch-scale:.984;
 }
 
 .hero-card.is-dragging,
 .project-card.is-dragging,
 .service-card.is-dragging{
-  transition:box-shadow 140ms var(--motion-ease), opacity 140ms var(--motion-ease);
-  box-shadow:0 42px 105px rgba(0,0,0,.26) !important;
+  transition:box-shadow 100ms var(--motion-ease), opacity 100ms var(--motion-ease);
+  box-shadow:0 52px 120px rgba(0,0,0,.32) !important;
 }
 
 .hero-card.is-releasing,
 .project-card.is-releasing,
 .service-card.is-releasing{
-  transition:transform 320ms var(--motion-pop), box-shadow 240ms var(--motion-ease), opacity 220ms var(--motion-ease);
+  transition:transform 380ms var(--motion-pop), box-shadow 280ms var(--motion-ease), opacity 220ms var(--motion-ease);
 }
 
 .hero-card.is-front,
 .project-card.is-front,
 .service-card.is-front{
-  --front-scale:1.018;
-  box-shadow:0 38px 95px rgba(0,0,0,.24) !important;
+  --front-scale:1.022;
+  box-shadow:0 44px 100px rgba(0,0,0,.26) !important;
 }
 
 .hero-card.is-lift-pop,
 .project-card.is-lift-pop,
 .service-card.is-lift-pop{
   transition:transform 260ms var(--motion-pop), box-shadow 220ms var(--motion-ease), opacity 180ms var(--motion-ease);
+}
+
+/* Desktop hover lift — only fires on true pointer devices */
+@media(hover:hover) and (pointer:fine){
+  .hero-card.is-hover,
+  .project-card.is-hover,
+  .service-card.is-hover{
+    --front-scale:1.014;
+    box-shadow:0 36px 88px rgba(0,0,0,.2) !important;
+    transition:
+      transform 240ms var(--motion-ease),
+      box-shadow 240ms var(--motion-ease),
+      opacity 240ms var(--motion-ease);
+  }
 }
 
 .hero-card::after,
@@ -1177,26 +1193,85 @@ body::before{
   animation:none !important;
 }
 
-/* Desktop/tablet: keep original collage but integrate touch motion */
+/* ── Hero entrance ─────────────────────────────────────────────────
+   Cards are hidden via [data-reveal] opacity:0 until JS adds
+   is-hero-entered. Each card has a direction-appropriate entrance.
+   ----------------------------------------------------------------- */
+.hero-card-main{
+  --enter-ox: -18px;
+  --enter-oy: 12px;
+}
+.hero-card-strategy{
+  --enter-ox: -24px;
+  --enter-oy: 20px;
+}
+.hero-card-profile{
+  --enter-ox: 20px;
+  --enter-oy: 8px;
+}
+
+/* Hero entrance uses opacity + a CSS var offset that transitions to 0
+   once is-hero-entered is added. The card's own !important transform
+   formula already includes --enter-ox/oy, so no keyframe conflict. */
+.motion-ready .hero-card{
+  transition:
+    transform var(--motion-speed) var(--motion-ease),
+    box-shadow var(--motion-speed) var(--motion-ease),
+    opacity 560ms var(--motion-pop) !important;
+}
+
+.motion-ready .hero-card:not(.is-hero-entered){
+  opacity:0 !important;
+  pointer-events:none;
+  --enter-active: 1;
+}
+
+.motion-ready .hero-card.is-hero-entered{
+  opacity:1;
+  --enter-active: 0;
+  transition-delay:0ms !important;
+}
+
+.motion-ready .hero-card-main.is-hero-entered  { transition-delay:0ms !important; }
+.motion-ready .hero-card-strategy.is-hero-entered { transition-delay:110ms !important; }
+.motion-ready .hero-card-profile.is-hero-entered  { transition-delay:220ms !important; }
+
+/* Desktop/tablet: collage positions — parallax, drag and entrance offset integrated.
+   --enter-active is 1 before is-hero-entered, 0 after — so the entrance
+   offset dissolves away as part of the opacity transition. */
 .hero-card-main{
   transform:
-    translateX(calc(-42% + var(--drag-x,0px)))
-    translateY(var(--drag-y,0px))
+    translateX(calc(-42% + var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
+    translateY(calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
     rotate(3deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-strategy{
   transform:
-    translate3d(var(--drag-x,0px), var(--drag-y,0px), 0)
+    translate3d(
+      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      0
+    )
     rotate(-5deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-profile{
   transform:
-    translate3d(var(--drag-x,0px), var(--drag-y,0px), 0)
+    translate3d(
+      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      0
+    )
     rotate(-4deg)
+    rotateX(var(--para-rx,0deg))
+    rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
@@ -1322,11 +1397,13 @@ body::before{
 
 
 .motion-ready .background-word.is-visible{
-  transition:opacity 620ms var(--motion-ease);
+  animation:optimizedReveal 700ms var(--motion-ease) forwards;
+  animation-delay:var(--reveal-delay,0ms);
 }
 
 .motion-ready .section-heading.is-visible{
-  transition:opacity 520ms var(--motion-ease);
+  animation:optimizedReveal 560ms var(--motion-ease) forwards;
+  animation-delay:var(--reveal-delay,0ms);
 }
 
 @keyframes optimizedReveal{

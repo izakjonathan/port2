@@ -9,21 +9,40 @@ export default function Home() {
   const activeCardRef = useRef(null);
   const dragFrameRef = useRef(null);
   const scrollFrameRef = useRef(null);
+  const paraFrameRef = useRef(null);
   const liftTimersRef = useRef([]);
 
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
+    const heroCards = Array.from(document.querySelectorAll(".hero-card"));
     const revealItems = Array.from(document.querySelectorAll("[data-reveal]"));
     const projectStack = document.querySelector("[data-project-stack]");
     const projectCards = projectStack
       ? Array.from(projectStack.querySelectorAll("[data-stack-card]"))
       : [];
     const menuNodes = Array.from(document.querySelectorAll(".fixed-menu"));
+    const heroSection = document.querySelector(".home-hero");
 
     let currentDrag = null;
     let lastScrollY = window.scrollY;
     let lastTapAt = 0;
+    let heroMouseX = 0;
+    let heroMouseY = 0;
+    let isHeroHovered = false;
 
+    // ── Hero entrance ──────────────────────────────────────────────
+    // Cards start invisible (CSS sets opacity:0 before motion-ready).
+    // Stagger each hero card entrance with a direction-aware class.
+    const entranceTimers = [];
+    heroCards.forEach((card, i) => {
+      const delay = 120 + i * 110;
+      const t = window.setTimeout(() => {
+        card.classList.add("is-hero-entered");
+      }, delay);
+      entranceTimers.push(t);
+    });
+
+    // ── Helpers ────────────────────────────────────────────────────
     const resetCardLayers = () => {
       cards.forEach((card, index) => {
         card.classList.remove("is-front");
@@ -55,9 +74,10 @@ export default function Home() {
 
       window.setTimeout(() => {
         card.classList.remove("is-touching", "is-releasing");
-      }, 180);
+      }, 120);
     };
 
+    // ── Scroll motion ──────────────────────────────────────────────
     const updateScrollMotion = () => {
       scrollFrameRef.current = null;
 
@@ -97,13 +117,84 @@ export default function Home() {
       }
     };
 
+    // ── Mouse parallax (desktop hero only) ────────────────────────
+    const updateParallax = () => {
+      paraFrameRef.current = null;
+      if (!isHeroHovered) return;
+
+      heroCards.forEach((card) => {
+        if (currentDrag?.card === card) return; // skip card being dragged
+
+        const depth = parseFloat(card.dataset.depth || "1");
+        const rect = card.getBoundingClientRect();
+        const cardCx = rect.left + rect.width / 2;
+        const cardCy = rect.top + rect.height / 2;
+
+        // Offset from card centre, scaled by depth, capped gently
+        const dx = Math.max(-22, Math.min(22, (heroMouseX - cardCx) * 0.028 * depth));
+        const dy = Math.max(-16, Math.min(16, (heroMouseY - cardCy) * 0.022 * depth));
+
+        // Tilt: opposite direction to offset (card faces cursor)
+        const tiltX = Math.max(-5, Math.min(5, -(heroMouseY - cardCy) * 0.006 * depth));
+        const tiltY = Math.max(-6, Math.min(6,  (heroMouseX - cardCx) * 0.006 * depth));
+
+        card.style.setProperty("--para-x", `${dx.toFixed(2)}px`);
+        card.style.setProperty("--para-y", `${dy.toFixed(2)}px`);
+        card.style.setProperty("--para-rx", `${tiltX.toFixed(2)}deg`);
+        card.style.setProperty("--para-ry", `${tiltY.toFixed(2)}deg`);
+      });
+    };
+
+    const requestParallax = () => {
+      if (!paraFrameRef.current) {
+        paraFrameRef.current = requestAnimationFrame(updateParallax);
+      }
+    };
+
+    const clearParallax = () => {
+      heroCards.forEach((card) => {
+        card.style.setProperty("--para-x", "0px");
+        card.style.setProperty("--para-y", "0px");
+        card.style.setProperty("--para-rx", "0deg");
+        card.style.setProperty("--para-ry", "0deg");
+      });
+    };
+
+    const onHeroMouseMove = (event) => {
+      heroMouseX = event.clientX;
+      heroMouseY = event.clientY;
+      isHeroHovered = true;
+      requestParallax();
+    };
+
+    const onHeroMouseLeave = () => {
+      isHeroHovered = false;
+      clearParallax();
+    };
+
+    if (heroSection) {
+      heroSection.addEventListener("mousemove", onHeroMouseMove, { passive: true });
+      heroSection.addEventListener("mouseleave", onHeroMouseLeave);
+    }
+
+    // ── Card event listeners ───────────────────────────────────────
     cards.forEach((card, index) => {
       card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
       card.style.setProperty("--drag-x", "0px");
       card.style.setProperty("--drag-y", "0px");
+      card.style.setProperty("--para-x", "0px");
+      card.style.setProperty("--para-y", "0px");
+      card.style.setProperty("--para-rx", "0deg");
+      card.style.setProperty("--para-ry", "0deg");
 
-      card.addEventListener("contextmenu", (event) => {
-        event.preventDefault();
+      card.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      // Hover (desktop only — CSS guards with @media hover:hover)
+      card.addEventListener("mouseenter", () => {
+        if (!currentDrag) card.classList.add("is-hover");
+      });
+      card.addEventListener("mouseleave", () => {
+        card.classList.remove("is-hover");
       });
 
       card.addEventListener("click", (event) => {
@@ -156,7 +247,7 @@ export default function Home() {
 
         const rect = card.getBoundingClientRect();
         card.dataset.didDrag = "false";
-        card.classList.remove("is-releasing");
+        card.classList.remove("is-releasing", "is-hover");
         card.classList.add("is-touching");
         card.style.setProperty("--tap-x", `${event.clientX - rect.left}px`);
         card.style.setProperty("--tap-y", `${event.clientY - rect.top}px`);
@@ -192,8 +283,9 @@ export default function Home() {
           }
         }
 
-        currentDrag.nextX = Math.max(-30, Math.min(30, dx * 0.22));
-        currentDrag.nextY = Math.max(-24, Math.min(24, dy * 0.18));
+        // Increased resistance factor: feels more 1:1 now
+        currentDrag.nextX = Math.max(-38, Math.min(38, dx * 0.34));
+        currentDrag.nextY = Math.max(-30, Math.min(30, dy * 0.28));
 
         if (!dragFrameRef.current) {
           dragFrameRef.current = requestAnimationFrame(() => {
@@ -217,6 +309,7 @@ export default function Home() {
       });
     });
 
+    // ── Scroll reveal ──────────────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -231,25 +324,26 @@ export default function Home() {
       observer.observe(item);
     });
 
-    const onScroll = () => {
-      requestScrollMotion();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // ── Boot ───────────────────────────────────────────────────────
+    window.addEventListener("scroll", requestScrollMotion, { passive: true });
     document.body.classList.add("motion-ready");
     requestScrollMotion();
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", requestScrollMotion);
       observer.disconnect();
-      liftTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      if (heroSection) {
+        heroSection.removeEventListener("mousemove", onHeroMouseMove);
+        heroSection.removeEventListener("mouseleave", onHeroMouseLeave);
+      }
+      entranceTimers.forEach((t) => window.clearTimeout(t));
+      liftTimersRef.current.forEach((t) => window.clearTimeout(t));
       liftTimersRef.current = [];
       if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
+      if (paraFrameRef.current) cancelAnimationFrame(paraFrameRef.current);
     };
   }, []);
-
-
 
   return (
     <main className="site-home">
