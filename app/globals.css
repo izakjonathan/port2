@@ -115,14 +115,6 @@ select {
   line-height: 1;
   letter-spacing: -0.045em;
   font-weight: 400;
-  transition: opacity 160ms ease, transform 160ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .fixed-menu-link:hover {
-    opacity: 0.54;
-    transform: scale(0.97);
-  }
 }
 
 .fixed-menu-brand {
@@ -428,27 +420,6 @@ select {
   letter-spacing: 0.08em;
 }
 
-.project-card > span:first-child,
-.service-card > span:first-child {
-  display: inline-flex;
-  width: fit-content;
-  min-width: 34px;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
-.project-card-2 > span:first-child,
-.service-card-dev > span:first-child {
-  background: rgba(255, 255, 255, 0.14);
-}
-
 .project-card-1 {
   left: 4vw;
   top: 15px;
@@ -578,14 +549,6 @@ select {
   color: var(--muted);
   font-size: clamp(20px, 2.2vw, 34px);
   letter-spacing: -0.06em;
-  transition: opacity 160ms ease, transform 160ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .about-section a:hover {
-    opacity: 0.5;
-    transform: translateX(4px);
-  }
 }
 
 .about-section p {
@@ -1072,26 +1035,6 @@ body::before{
     radial-gradient(circle at 84% 72%, rgba(255,222,92,.15), transparent 34%);
   opacity:.7;
   transform:translateZ(0);
-  animation:ambientDrift 28s ease-in-out infinite alternate;
-}
-
-@keyframes ambientDrift{
-  0%{
-    background-position:0% 0%;
-    transform:translateZ(0) scale(1);
-  }
-  33%{
-    background-position:3% 5%;
-    transform:translateZ(0) scale(1.022) translateX(8px) translateY(6px);
-  }
-  66%{
-    background-position:-4% 3%;
-    transform:translateZ(0) scale(1.018) translateX(-10px) translateY(4px);
-  }
-  100%{
-    background-position:5% -4%;
-    transform:translateZ(0) scale(1.03) translateX(5px) translateY(-8px);
-  }
 }
 
 .site-home{
@@ -1267,12 +1210,11 @@ body::before{
   --enter-oy: 8px;
 }
 
-/* Hero entrance uses opacity + a CSS var offset that transitions to 0
-   once is-hero-entered is added. The card's own !important transform
-   formula already includes --enter-ox/oy, so no keyframe conflict. */
+/* Hero cards use continuously-updated transform variables.
+   Do not transition transform here: transform transitions fight the live rAF
+   values and make the floating/parallax feel delayed or janky. */
 .motion-ready .hero-card{
   transition:
-    transform var(--motion-speed) var(--motion-ease),
     box-shadow var(--motion-speed) var(--motion-ease),
     opacity 560ms var(--motion-pop) !important;
 }
@@ -1298,37 +1240,31 @@ body::before{
    offset dissolves away as part of the opacity transition. */
 .hero-card-main{
   transform:
-    translateX(calc(-42% + var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
-    translateY(calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
-    rotate(3deg)
-    rotateX(var(--para-rx,0deg))
-    rotateY(var(--para-ry,0deg))
+    translateX(calc(-42% + var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
+    translateY(calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
+    rotate(calc(3deg + var(--hero-r, 0deg)))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-strategy{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(-5deg)
-    rotateX(var(--para-rx,0deg))
-    rotateY(var(--para-ry,0deg))
+    rotate(calc(-5deg + var(--hero-r, 0deg)))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
 .hero-card-profile{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(-4deg)
-    rotateX(var(--para-rx,0deg))
-    rotateY(var(--para-ry,0deg))
+    rotate(calc(-4deg + var(--hero-r, 0deg)))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
 }
 
@@ -1360,9 +1296,9 @@ body::before{
     min-height:455px !important;
     padding:18px 18px 34px !important;
     transform:
-      translateX(calc(-50% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(3deg)
+      translateX(calc(-50% + var(--drag-x,0px) + var(--hero-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--hero-y,0px)))
+      rotate(calc(3deg + var(--hero-r, 0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1375,9 +1311,9 @@ body::before{
     min-height:225px !important;
     padding:18px !important;
     transform:
-      translateX(calc(-76% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(-5deg)
+      translateX(calc(-76% + var(--drag-x,0px) + var(--hero-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--hero-y,0px)))
+      rotate(calc(-5deg + var(--hero-r, 0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1390,9 +1326,9 @@ body::before{
     min-height:370px !important;
     padding:20px 16px !important;
     transform:
-      translateX(calc(-22% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(-4deg)
+      translateX(calc(-22% + var(--drag-x,0px) + var(--hero-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--hero-y,0px)))
+      rotate(calc(-4deg + var(--hero-r, 0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1480,76 +1416,7 @@ body::before{
 }
 
 /* =====================================================
-   CASE STUDY PAGE ENTRANCE
-   layout.js adds site-ready to <html> on all non-home paths.
-   Stagger children of .case-study for a clean load-in.
-   ===================================================== */
-
-.site-ready .case-study .case-hero.case-panel{
-  animation: caseEnter 680ms var(--motion-pop) both;
-  animation-delay: 60ms;
-}
-
-.site-ready .case-study .case-showcase{
-  animation: caseEnter 680ms var(--motion-pop) both;
-  animation-delay: 160ms;
-}
-
-.site-ready .case-study .case-split:nth-of-type(1){
-  animation: caseEnter 620ms var(--motion-ease) both;
-  animation-delay: 200ms;
-}
-
-.site-ready .case-study .case-split:nth-of-type(2){
-  animation: caseEnter 620ms var(--motion-ease) both;
-  animation-delay: 240ms;
-}
-
-@keyframes caseEnter{
-  from{
-    opacity:0;
-    transform:translate3d(0, 18px, 0);
-  }
-  to{
-    opacity:1;
-    transform:translate3d(0, 0, 0);
-  }
-}
-
-/* Archive page entrance */
-.site-ready .archive-hero{
-  animation: caseEnter 640ms var(--motion-pop) both;
-  animation-delay: 40ms;
-}
-
-.site-ready .archive-list .archive-row{
-  animation: caseEnter 560ms var(--motion-ease) both;
-}
-
-.site-ready .archive-list .archive-row:nth-child(1){ animation-delay: 100ms; }
-.site-ready .archive-list .archive-row:nth-child(2){ animation-delay: 155ms; }
-.site-ready .archive-list .archive-row:nth-child(3){ animation-delay: 210ms; }
-.site-ready .archive-list .archive-row:nth-child(4){ animation-delay: 265ms; }
-.site-ready .archive-list .archive-row:nth-child(5){ animation-delay: 320ms; }
-.site-ready .archive-list .archive-row:nth-child(n+6){ animation-delay: 370ms; }
-
-/* =====================================================
-   DESKTOP PROJECT + SERVICE CARD SCROLL REVEAL
-   Cards have data-card-layer so the default optimizedReveal
-   is suppressed. Give them an opacity-only fade on desktop.
-   ===================================================== */
-
-@media(min-width:901px){
-  .motion-ready [data-card-layer].is-visible{
-    animation: cardFadeIn 480ms var(--motion-ease) forwards !important;
-    animation-delay: var(--reveal-delay, 0ms) !important;
-  }
-
-  @keyframes cardFadeIn{
-    from{ opacity:0; }
-    to{ opacity:1; }
-  }
-}
+   V19 MOBILE VISUAL POLISH
    Visual-only refinements. No card transform rules here.
    Keeps the v18 Safari interaction fixes and v16 motion formulas intact.
    ===================================================== */
@@ -1827,7 +1694,6 @@ body::before{
   font-size: clamp(46px, 7vw, 96px);
   line-height: 0.8;
   letter-spacing: -0.08em;
-  transition: transform 220ms var(--motion-ease), opacity 220ms var(--motion-ease);
 }
 
 .case-nav a:first-child::after {
@@ -1846,7 +1712,7 @@ body::before{
 }
 
 .archive-row {
-  transition: padding 220ms var(--motion-ease), background 220ms var(--motion-ease), border-color 220ms var(--motion-ease), transform 220ms var(--motion-ease);
+  transition: padding 220ms var(--motion-ease), background 220ms var(--motion-ease), border-color 220ms var(--motion-ease);
 }
 
 .archive-row:active {
@@ -1859,26 +1725,9 @@ body::before{
     background: rgba(255, 255, 255, 0.26);
   }
 
-  .archive-row:hover {
-    transform: translateX(8px);
-  }
-
-  .archive-row:hover .archive-main h2::after {
-    content: " →";
-    opacity: 0.28;
-  }
-
   .case-nav a:hover {
     transform: translate3d(0, -3px, 0);
     box-shadow: 0 34px 90px rgba(0, 0, 0, 0.12);
-  }
-
-  .case-nav a:first-child:hover::after {
-    transform: translateX(-4px);
-  }
-
-  .case-nav a:last-child:hover::after {
-    transform: translateX(4px);
   }
 }
 
@@ -1984,5 +1833,803 @@ body::before{
     margin: 0 -8px;
     padding: 28px 8px;
     border-radius: 18px;
+  }
+}
+
+/* =====================================================
+   V27 DESIGN.MD REDESIGN — MONOPO SAIGON REFERENCE
+   Cinematic darkroom + white editorial architecture.
+   This block intentionally overrides older collage colors while preserving
+   the v26 mobile Safari, tap/drag and hero motion transform system.
+   ===================================================== */
+
+:root {
+  --color-paper-white: #ffffff;
+  --color-ink-black: #000000;
+  --color-carbon: #181818;
+  --color-ash: #6d6d6d;
+  --color-smoke: #9a9a9a;
+  --color-pewter: #808080;
+  --color-graphite: #636363;
+  --gradient-mercury-flow: linear-gradient(90deg, rgb(160, 224, 171), rgb(255, 172, 46) 50%, rgb(165, 45, 37));
+
+  --bg: var(--color-paper-white);
+  --black: var(--color-ink-black);
+  --ink: var(--color-carbon);
+  --muted: var(--color-ash);
+  --line: rgba(0, 0, 0, 0.16);
+  --pink: var(--color-paper-white);
+  --yellow: var(--color-paper-white);
+  --orange: var(--color-carbon);
+  --white-card: var(--color-paper-white);
+
+  --font-roobert: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-main: var(--font-roobert);
+  --font-system-ui: system-ui, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --type-hero: clamp(62px, 16vw, 225px);
+  --type-section: clamp(72px, 12vw, 170px);
+  --type-card: clamp(44px, 7.2vw, 94px);
+  --type-body: 18px;
+  --type-meta: 11px;
+  --line-tight: 0.76;
+  --line-body: 1.39;
+  --track-tight: -0.055em;
+  --track-card: -0.045em;
+  --menu-size: 12px;
+  --menu-x: clamp(18px, 3vw, 40px);
+  --page-x: max(24px, calc((100vw - 1440px) / 2));
+}
+
+html,
+body {
+  background: var(--color-paper-white) !important;
+  color: var(--color-carbon) !important;
+  font-family: var(--font-roobert);
+  letter-spacing: normal;
+}
+
+body::selection {
+  background: var(--color-carbon);
+  color: var(--color-paper-white);
+}
+
+img,
+.case-media-frame,
+.project-card,
+.service-card,
+.hero-card {
+  border-radius: 0 !important;
+}
+
+/* Fixed ghost navigation — uses difference to remain visible across black/white frames. */
+.fixed-menu {
+  mix-blend-mode: difference;
+}
+
+.fixed-menu-inner {
+  padding: 0 var(--menu-x);
+}
+
+.fixed-menu-link {
+  color: var(--color-paper-white) !important;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fixed-menu-brand {
+  font-weight: 400;
+  text-transform: lowercase;
+}
+
+.fixed-menu-link:focus-visible,
+.archive-row:focus-visible,
+.case-nav a:focus-visible,
+.project-card:focus-visible,
+.service-card:focus-visible,
+.hero-card:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 6px;
+}
+
+/* Cinematic full viewport hero. */
+.site-home {
+  background: var(--color-paper-white) !important;
+}
+
+.home-hero {
+  min-height: 100svh !important;
+  background: var(--color-ink-black) !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+.home-hero::before,
+.home-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(18px);
+  opacity: 0.72;
+  transform: translateZ(0);
+}
+
+.home-hero::before {
+  width: min(76vw, 980px);
+  height: min(76vw, 980px);
+  left: 50%;
+  top: 50%;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(160, 224, 171, 0.42), transparent 23%),
+    radial-gradient(circle at 62% 46%, rgba(255, 172, 46, 0.55), transparent 28%),
+    radial-gradient(circle at 70% 68%, rgba(165, 45, 37, 0.55), transparent 31%),
+    radial-gradient(circle at 42% 72%, rgba(28, 68, 50, 0.74), transparent 38%);
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) rotate(-12deg) scale(0.86);
+}
+
+.home-hero::after {
+  width: min(58vw, 740px);
+  height: min(38vw, 500px);
+  right: -10vw;
+  bottom: 2vh;
+  background:
+    radial-gradient(ellipse at center, rgba(255,255,255,0.16), transparent 12%),
+    radial-gradient(ellipse at 36% 45%, rgba(99,99,99,0.36), transparent 38%);
+  transform: rotate(22deg);
+}
+
+.hero-card {
+  z-index: 2;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--color-paper-white) !important;
+  will-change: transform, opacity;
+  contain: layout paint style;
+}
+
+.hero-card-main {
+  top: 50% !important;
+  left: 50% !important;
+  width: min(92vw, 1280px) !important;
+  min-height: auto !important;
+  padding: 0 !important;
+  text-align: center;
+  z-index: 40 !important;
+}
+
+.hero-card-main h1 {
+  margin: 0 !important;
+  max-width: none !important;
+  color: var(--color-paper-white) !important;
+  font-size: clamp(74px, 16.4vw, 225px) !important;
+  font-weight: 300 !important;
+  line-height: 0.76 !important;
+  letter-spacing: -0.055em !important;
+  text-transform: uppercase;
+}
+
+.hero-card-main h1 span {
+  color: var(--color-paper-white) !important;
+}
+
+.hero-card-meta {
+  position: absolute;
+  left: clamp(18px, 3vw, 40px);
+  right: clamp(18px, 3vw, 40px);
+  top: calc(env(safe-area-inset-top, 0px) + 82px);
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  color: rgba(255,255,255,0.72);
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+.hero-card-strategy,
+.hero-card-profile {
+  width: auto !important;
+  min-height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: var(--color-paper-white) !important;
+  border: 0 !important;
+  text-transform: uppercase;
+}
+
+.hero-card-strategy {
+  left: clamp(18px, 4vw, 58px) !important;
+  top: auto !important;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 68px) !important;
+  z-index: 55 !important;
+  max-width: 240px;
+}
+
+.strategy-count {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+  font-weight: 400;
+}
+
+.strategy-count span {
+  color: rgba(255,255,255,0.58) !important;
+}
+
+.hero-card-strategy h2 {
+  margin: 10px 0 6px !important;
+  color: var(--color-paper-white) !important;
+  font-size: 30px !important;
+  font-weight: 300 !important;
+  line-height: 1.0 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.hero-card-strategy h2 span,
+.hero-card-strategy p {
+  color: rgba(255,255,255,0.62) !important;
+}
+
+.hero-card-strategy p {
+  max-width: 28ch;
+  margin: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.36 !important;
+  letter-spacing: 0 !important;
+  text-transform: none;
+}
+
+.hero-card-profile {
+  right: clamp(18px, 4vw, 58px) !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 68px) !important;
+  z-index: 25 !important;
+  text-align: right;
+}
+
+.profile-dots,
+.profile-dot,
+.level-ring,
+.done-count {
+  display: none !important;
+}
+
+.hero-card-profile ul {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px !important;
+}
+
+.hero-card-profile li {
+  color: rgba(255,255,255,0.72) !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+}
+
+.hero-card-profile li b {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--color-paper-white);
+  font-weight: 400;
+}
+
+/* Transform formulas updated for the cinematic hero layout. */
+.hero-card-main {
+  transform:
+    translateX(calc(-50% + var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
+    translateY(calc(-50% + var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
+    rotate(calc(0deg + var(--hero-r, 0deg)))
+    scale(var(--touch-scale, var(--front-scale, 1))) !important;
+}
+
+.hero-card-strategy,
+.hero-card-profile {
+  transform:
+    translate3d(
+      calc(var(--drag-x,0px) + var(--hero-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--hero-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      0
+    )
+    rotate(var(--hero-r, 0deg))
+    scale(var(--touch-scale, var(--front-scale, 1))) !important;
+}
+
+/* White editorial work band. */
+.work-section,
+.archive-page {
+  background: var(--color-paper-white) !important;
+  color: var(--color-carbon) !important;
+  padding: clamp(86px, 11vw, 152px) var(--page-x) !important;
+}
+
+.background-word {
+  color: rgba(0,0,0,0.035) !important;
+  font-size: clamp(84px, 18vw, 225px) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.065em !important;
+  line-height: 0.76 !important;
+}
+
+.section-heading,
+.archive-hero {
+  max-width: 1440px;
+  margin-inline: auto;
+  display: grid !important;
+  grid-template-columns: minmax(70px, 120px) minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  border-top: 1px solid rgba(0,0,0,0.16);
+  padding-top: 24px;
+}
+
+.section-heading span,
+.section-heading a,
+.archive-hero span,
+.project-card span,
+.project-card footer,
+.service-card span,
+.case-kicker,
+.case-section-label,
+.case-meta-panel span,
+.archive-row span,
+.archive-row small,
+.case-nav small {
+  color: var(--color-ash) !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+.section-heading h2,
+.archive-hero h1 {
+  margin: 0 !important;
+  color: var(--color-carbon) !important;
+  font-size: clamp(78px, 12vw, 170px) !important;
+  font-weight: 300 !important;
+  line-height: 0.86 !important;
+  letter-spacing: -0.06em !important;
+  text-transform: uppercase;
+}
+
+.project-card-stage {
+  max-width: 1440px;
+  margin: clamp(64px, 9vw, 120px) auto 0;
+  min-height: 1050px;
+}
+
+.project-card {
+  background: var(--color-ink-black) !important;
+  color: var(--color-paper-white) !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: clamp(24px, 3vw, 40px) !important;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.86;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(160,224,171,0.2), transparent 20%),
+    radial-gradient(circle at 56% 60%, rgba(255,172,46,0.24), transparent 28%),
+    radial-gradient(circle at 78% 82%, rgba(165,45,37,0.28), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,0.08), transparent 46%);
+  z-index: 0;
+}
+
+.project-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.project-card h3 {
+  color: var(--color-paper-white) !important;
+  font-size: clamp(44px, 7vw, 94px) !important;
+  font-weight: 300 !important;
+  line-height: 0.86 !important;
+  letter-spacing: -0.055em !important;
+  text-transform: uppercase;
+}
+
+.project-card p {
+  max-width: 34ch;
+  color: rgba(255,255,255,0.72) !important;
+  font-size: 18px !important;
+  line-height: 1.36 !important;
+  letter-spacing: 0 !important;
+}
+
+.project-card footer {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 14px;
+}
+
+/* Dark immersive services frame. */
+.services-section {
+  min-height: 100svh;
+  background: var(--color-ink-black) !important;
+  color: var(--color-paper-white) !important;
+  padding: clamp(86px, 11vw, 152px) var(--page-x) !important;
+  overflow: hidden;
+}
+
+.services-section::before {
+  content: "";
+  position: absolute;
+  inset: 8% -18% auto auto;
+  width: min(70vw, 900px);
+  height: min(70vw, 900px);
+  background:
+    radial-gradient(circle at 24% 38%, rgba(160,224,171,0.22), transparent 26%),
+    radial-gradient(circle at 64% 42%, rgba(255,172,46,0.28), transparent 30%),
+    radial-gradient(circle at 62% 76%, rgba(165,45,37,0.34), transparent 34%);
+  filter: blur(24px);
+  border-radius: 50% !important;
+  opacity: 0.62;
+}
+
+.services-section .background-word {
+  color: rgba(255,255,255,0.05) !important;
+}
+
+.services-section .section-heading {
+  border-top-color: rgba(255,255,255,0.22);
+  color: var(--color-paper-white);
+}
+
+.services-section .section-heading h2 {
+  color: var(--color-paper-white) !important;
+}
+
+.service-card-stage {
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.service-card {
+  background: var(--color-paper-white) !important;
+  color: var(--color-carbon) !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: clamp(24px, 3vw, 40px) !important;
+}
+
+.service-card h3 {
+  color: var(--color-carbon) !important;
+  font-size: clamp(39px, 5vw, 78px) !important;
+  font-weight: 300 !important;
+  line-height: 0.92 !important;
+  letter-spacing: -0.055em !important;
+  text-transform: uppercase;
+}
+
+.service-card p {
+  color: var(--color-ash) !important;
+  font-size: 18px !important;
+  line-height: 1.36 !important;
+  letter-spacing: 0 !important;
+}
+
+.about-section {
+  background: var(--color-paper-white) !important;
+  color: var(--color-carbon) !important;
+  padding: clamp(86px, 11vw, 152px) var(--page-x) !important;
+  border-top: 1px solid rgba(0,0,0,0.16);
+}
+
+.about-section > span {
+  color: var(--color-ash) !important;
+  font-size: 11px !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+.about-section p {
+  max-width: 1120px;
+  color: var(--color-carbon) !important;
+  font-size: clamp(45px, 6vw, 94px) !important;
+  font-weight: 300 !important;
+  line-height: 1.0 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.about-section a,
+.section-heading a,
+.case-nav a,
+.archive-row {
+  border-radius: 75px !important;
+}
+
+.about-section a,
+.section-heading a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 2px 10px;
+  background: var(--color-carbon) !important;
+  color: var(--color-paper-white) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+/* Archive and case studies become editorial monochrome pages. */
+.archive-hero {
+  display: block !important;
+  padding-top: clamp(90px, 13vw, 180px);
+}
+
+.archive-hero h1 {
+  margin-top: 20px !important;
+}
+
+.archive-list {
+  max-width: 1440px;
+  margin: 80px auto 0;
+  border-top: 1px solid rgba(0,0,0,0.16);
+}
+
+.archive-row {
+  color: var(--color-carbon) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.16) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.archive-row h2,
+.archive-row strong {
+  color: var(--color-carbon) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.case-study {
+  background: var(--color-paper-white) !important;
+  color: var(--color-carbon) !important;
+  padding: calc(env(safe-area-inset-top, 0px) + 96px) var(--page-x) 80px !important;
+}
+
+.case-panel,
+.case-copy-card {
+  background: transparent !important;
+  color: var(--color-carbon) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-top: 1px solid rgba(0,0,0,0.16);
+}
+
+.case-hero.case-panel {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 28px 0 clamp(64px, 8vw, 110px) !important;
+}
+
+.case-hero h1,
+.case-split h2,
+.case-wide-copy h2 {
+  color: var(--color-carbon) !important;
+  font-weight: 300 !important;
+  line-height: 0.86 !important;
+  letter-spacing: -0.06em !important;
+  text-transform: uppercase;
+}
+
+.case-subtitle,
+.case-split p,
+.case-wide-copy p {
+  color: var(--color-carbon) !important;
+  font-weight: 300 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.case-meta-panel {
+  background: var(--color-ink-black) !important;
+  color: var(--color-paper-white) !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+}
+
+.case-meta-panel strong {
+  color: var(--color-paper-white) !important;
+  font-weight: 400 !important;
+}
+
+.case-media-frame {
+  background: var(--color-ink-black) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.case-media-frame img {
+  border-radius: 0 !important;
+  filter: grayscale(1) contrast(1.08);
+}
+
+.case-nav a {
+  background: var(--color-ink-black) !important;
+  color: var(--color-paper-white) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.case-nav a span {
+  color: var(--color-paper-white) !important;
+  font-weight: 300 !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover,
+  .service-card:hover,
+  .archive-row:hover,
+  .case-nav a:hover {
+    box-shadow: none !important;
+    background-color: var(--color-ink-black) !important;
+  }
+
+  .service-card:hover,
+  .archive-row:hover {
+    color: var(--color-paper-white) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --menu-size: 12px;
+    --menu-x: 18px;
+    --type-hero: clamp(72px, 22vw, 106px);
+    --type-section: clamp(74px, 18vw, 112px);
+    --type-card: clamp(46px, 14vw, 72px);
+    --page-x: 18px;
+  }
+
+  .fixed-menu-footer {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+
+  .home-hero {
+    min-height: 100svh !important;
+  }
+
+  .hero-card-main {
+    top: 48% !important;
+    left: 50% !important;
+    width: 94vw !important;
+    max-width: none !important;
+    padding: 0 !important;
+    transform:
+      translateX(calc(-50% + var(--drag-x,0px) + var(--hero-x,0px)))
+      translateY(calc(-50% + var(--drag-y,0px) + var(--hero-y,0px)))
+      rotate(var(--hero-r, 0deg))
+      scale(var(--touch-scale, var(--front-scale, 1))) !important;
+  }
+
+  .hero-card-main h1 {
+    font-size: clamp(68px, 23vw, 118px) !important;
+    line-height: 0.76 !important;
+    letter-spacing: -0.07em !important;
+  }
+
+  .hero-card-meta {
+    top: calc(env(safe-area-inset-top, 0px) + 74px);
+    grid-template-columns: 1fr;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .hero-card-strategy {
+    left: 18px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 74px) !important;
+    max-width: 180px;
+    transform:
+      translate3d(calc(var(--drag-x,0px) + var(--hero-x,0px)), calc(var(--drag-y,0px) + var(--hero-y,0px)), 0)
+      rotate(var(--hero-r, 0deg))
+      scale(var(--touch-scale, var(--front-scale, 1))) !important;
+  }
+
+  .hero-card-profile {
+    right: 18px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 76px) !important;
+    transform:
+      translate3d(calc(var(--drag-x,0px) + var(--hero-x,0px)), calc(var(--drag-y,0px) + var(--hero-y,0px)), 0)
+      rotate(var(--hero-r, 0deg))
+      scale(var(--touch-scale, var(--front-scale, 1))) !important;
+  }
+
+  .hero-card-strategy h2 {
+    font-size: 24px !important;
+  }
+
+  .hero-card-strategy p,
+  .hero-card-profile li {
+    font-size: 11px !important;
+  }
+
+  .work-section,
+  .services-section,
+  .about-section,
+  .archive-page,
+  .case-study {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .section-heading {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .section-heading h2,
+  .archive-hero h1 {
+    font-size: clamp(74px, 19vw, 112px) !important;
+    line-height: 0.84 !important;
+  }
+
+  .project-card-stage {
+    min-height: 1320px !important;
+  }
+
+  .project-card {
+    width: 86vw !important;
+    max-width: 390px !important;
+    min-height: 245px !important;
+  }
+
+  .project-card h3 {
+    font-size: clamp(44px, 13vw, 68px) !important;
+  }
+
+  .project-card p,
+  .service-card p {
+    font-size: 16px !important;
+    line-height: 1.39 !important;
+  }
+
+  .project-card-1{top:10px !important; --card-r:0deg;}
+  .project-card-2{top:255px !important; --card-r:0deg;}
+  .project-card-3{top:500px !important; --card-r:0deg;}
+  .project-card-4{top:745px !important; --card-r:0deg;}
+  .project-card-5{top:990px !important; --card-r:0deg;}
+
+  .service-card-stage {
+    min-height: 1050px !important;
+  }
+
+  .service-card {
+    min-height: 225px !important;
+  }
+
+  .about-section p {
+    font-size: clamp(42px, 12vw, 64px) !important;
+    line-height: 0.98 !important;
+  }
+
+  .archive-row {
+    border-radius: 0 !important;
+  }
+
+  .case-hero h1,
+  .case-split h2,
+  .case-wide-copy h2 {
+    font-size: clamp(58px, 17vw, 96px) !important;
   }
 }

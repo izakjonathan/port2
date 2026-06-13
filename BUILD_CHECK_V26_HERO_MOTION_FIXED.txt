@@ -1,0 +1,28 @@
+Build: portfolio-reference-collage-v26-hero-motion-fixed.zip
+Date: 2026-06-13
+
+Fix summary:
+- Root cause found: v25 JavaScript updated --hero-x / --hero-y / --hero-r, but the mobile hero-card CSS transform overrides ignored those variables.
+- Root cause found: v25 only updated hero motion on scroll, so there was no constant idle floating movement.
+- Replaced scroll-only hero motion with one continuous requestAnimationFrame loop for only the three hero cards.
+- The single hero motion loop combines idle floating + scroll parallax.
+- Mobile CSS transforms now include --hero-x / --hero-y / --hero-r, so the movement is visible on iPhone Safari/mobile widths.
+- Removed transform transitions from .motion-ready .hero-card to avoid lag/jank while rAF updates transform variables.
+- Reduced-motion preference disables and resets hero motion.
+- Motion pauses while the tab/document is hidden.
+- Existing card tap/drag and Safari long-press protections are kept.
+
+Checks run:
+- npm ci --no-audit --prefer-offline
+- npm run build
+
+Build result:
+- Next.js 15.5.18
+- Compiled successfully
+- Generated static pages: 10/10
+- Final route output completed successfully
+
+Additional verification:
+- Production CSS contains --hero-x / --hero-y / --hero-r in desktop and mobile hero-card transforms.
+- Production page bundle contains the continuous requestAnimationFrame hero motion loop.
+- Local Chromium CDP visual/runtime testing was blocked by the environment's local-site policy, but the Next production build completed successfully and static HTML served via curl.
