@@ -10,6 +10,7 @@ export default function Home() {
   const dragFrameRef = useRef(null);
   const scrollFrameRef = useRef(null);
   const paraFrameRef = useRef(null);
+  const floatFrameRef = useRef(null);
   const liftTimersRef = useRef([]);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function Home() {
     let heroMouseX = 0;
     let heroMouseY = 0;
     let isHeroHovered = false;
+    let floatStart = performance.now();
 
     // ── Hero entrance ──────────────────────────────────────────────
     // Cards start invisible (CSS sets opacity:0 before motion-ready).
@@ -117,6 +119,10 @@ export default function Home() {
           card.style.setProperty("--stack-opacity", opacity.toFixed(3));
         });
       }
+
+      if (!prefersReducedMotion && heroCards.length) {
+        updateHeroScrollParallax(scrollY);
+      }
     };
 
     const requestScrollMotion = () => {
@@ -186,6 +192,71 @@ export default function Home() {
       heroSection.addEventListener("mouseleave", onHeroMouseLeave);
     }
 
+    // ── Ambient hero float + scroll parallax ───────────────────────
+    // This is intentionally limited to the three hero cards. It writes to
+    // dedicated CSS variables that are already part of each card transform,
+    // so it does not compete with tap/drag/front-card motion.
+    const heroFloatProfiles = [
+      { x: 2.8, y: 4.6, r: 0.22, speed: 0.00072, phase: 0.2, sx: -0.018, sy: 0.030, sr: -0.006 },
+      { x: 3.8, y: 3.2, r: 0.26, speed: 0.00092, phase: 2.1, sx: 0.024, sy: -0.022, sr: 0.007 },
+      { x: 3.2, y: 4.0, r: 0.20, speed: 0.00080, phase: 4.0, sx: 0.016, sy: 0.026, sr: 0.005 },
+    ];
+
+    const updateHeroScrollParallax = (scrollY = window.scrollY) => {
+      const maxScroll = Math.min(Math.max(scrollY, 0), 620);
+
+      heroCards.forEach((card, index) => {
+        const profile = heroFloatProfiles[index] || heroFloatProfiles[0];
+        if (currentDrag?.card === card) return;
+
+        const sx = Math.max(-14, Math.min(14, maxScroll * profile.sx));
+        const sy = Math.max(-18, Math.min(18, maxScroll * profile.sy));
+        const sr = Math.max(-3, Math.min(3, maxScroll * profile.sr));
+
+        card.style.setProperty("--scroll-x", `${sx.toFixed(2)}px`);
+        card.style.setProperty("--scroll-y", `${sy.toFixed(2)}px`);
+        card.style.setProperty("--scroll-r", `${sr.toFixed(2)}deg`);
+      });
+    };
+
+    const updateHeroFloat = (now) => {
+      if (prefersReducedMotion) return;
+
+      const elapsed = now - floatStart;
+
+      heroCards.forEach((card, index) => {
+        const profile = heroFloatProfiles[index] || heroFloatProfiles[0];
+        if (currentDrag?.card === card) return;
+
+        const wave = elapsed * profile.speed + profile.phase;
+        const x = Math.sin(wave) * profile.x;
+        const y = Math.cos(wave * 0.86) * profile.y;
+        const r = Math.sin(wave * 0.72) * profile.r;
+
+        card.style.setProperty("--float-x", `${x.toFixed(2)}px`);
+        card.style.setProperty("--float-y", `${y.toFixed(2)}px`);
+        card.style.setProperty("--float-r", `${r.toFixed(3)}deg`);
+      });
+
+      floatFrameRef.current = requestAnimationFrame(updateHeroFloat);
+    };
+
+    const clearHeroAmbientMotion = () => {
+      heroCards.forEach((card) => {
+        card.style.setProperty("--float-x", "0px");
+        card.style.setProperty("--float-y", "0px");
+        card.style.setProperty("--float-r", "0deg");
+        card.style.setProperty("--scroll-x", "0px");
+        card.style.setProperty("--scroll-y", "0px");
+        card.style.setProperty("--scroll-r", "0deg");
+      });
+    };
+
+    if (!prefersReducedMotion && heroCards.length) {
+      updateHeroScrollParallax();
+      floatFrameRef.current = requestAnimationFrame(updateHeroFloat);
+    }
+
     // ── Card event listeners ───────────────────────────────────────
     cards.forEach((card, index) => {
       card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
@@ -195,6 +266,12 @@ export default function Home() {
       card.style.setProperty("--para-y", "0px");
       card.style.setProperty("--para-rx", "0deg");
       card.style.setProperty("--para-ry", "0deg");
+      card.style.setProperty("--float-x", "0px");
+      card.style.setProperty("--float-y", "0px");
+      card.style.setProperty("--float-r", "0deg");
+      card.style.setProperty("--scroll-x", "0px");
+      card.style.setProperty("--scroll-y", "0px");
+      card.style.setProperty("--scroll-r", "0deg");
 
       card.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -360,6 +437,8 @@ export default function Home() {
       if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
       if (paraFrameRef.current) cancelAnimationFrame(paraFrameRef.current);
+      if (floatFrameRef.current) cancelAnimationFrame(floatFrameRef.current);
+      clearHeroAmbientMotion();
     };
   }, []);
 

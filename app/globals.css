@@ -1241,9 +1241,9 @@ body::before{
    offset dissolves away as part of the opacity transition. */
 .hero-card-main{
   transform:
-    translateX(calc(-42% + var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
-    translateY(calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
-    rotate(3deg)
+    translateX(calc(-42% + var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))))
+    translateY(calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))))
+    rotate(calc(3deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
     rotateX(var(--para-rx,0deg))
     rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
@@ -1252,11 +1252,11 @@ body::before{
 .hero-card-strategy{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(-5deg)
+    rotate(calc(-5deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
     rotateX(var(--para-rx,0deg))
     rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
@@ -1265,11 +1265,11 @@ body::before{
 .hero-card-profile{
   transform:
     translate3d(
-      calc(var(--drag-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
-      calc(var(--drag-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
+      calc(var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px) + var(--para-x,0px) + calc(var(--enter-ox,0px) * var(--enter-active,0))),
+      calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px) + var(--para-y,0px) + calc(var(--enter-oy,0px) * var(--enter-active,0))),
       0
     )
-    rotate(-4deg)
+    rotate(calc(-4deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
     rotateX(var(--para-rx,0deg))
     rotateY(var(--para-ry,0deg))
     scale(var(--touch-scale, var(--front-scale, 1))) !important;
@@ -1303,9 +1303,9 @@ body::before{
     min-height:455px !important;
     padding:18px 18px 34px !important;
     transform:
-      translateX(calc(-50% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(3deg)
+      translateX(calc(-50% + var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px)))
+      rotate(calc(3deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1318,9 +1318,9 @@ body::before{
     min-height:225px !important;
     padding:18px !important;
     transform:
-      translateX(calc(-76% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(-5deg)
+      translateX(calc(-76% + var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px)))
+      rotate(calc(-5deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1333,9 +1333,9 @@ body::before{
     min-height:370px !important;
     padding:20px 16px !important;
     transform:
-      translateX(calc(-22% + var(--drag-x,0px)))
-      translateY(var(--drag-y,0px))
-      rotate(-4deg)
+      translateX(calc(-22% + var(--drag-x,0px) + var(--float-x,0px) + var(--scroll-x,0px)))
+      translateY(calc(var(--drag-y,0px) + var(--float-y,0px) + var(--scroll-y,0px)))
+      rotate(calc(-4deg + var(--float-r,0deg) + var(--scroll-r,0deg)))
       scale(var(--touch-scale, var(--front-scale, 1))) !important;
   }
 
@@ -1947,6 +1947,12 @@ a:focus-visible,
     --para-y: 0px;
     --para-rx: 0deg;
     --para-ry: 0deg;
+    --float-x: 0px;
+    --float-y: 0px;
+    --float-r: 0deg;
+    --scroll-x: 0px;
+    --scroll-y: 0px;
+    --scroll-r: 0deg;
   }
 
   .fixed-menu.is-scroll-down,
