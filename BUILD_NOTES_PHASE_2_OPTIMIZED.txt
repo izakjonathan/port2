@@ -1,7 +1,0 @@
-{
-  "source": "/mnt/data/portfolio-reference-collage-phase2-mobile-motion.zip",
-  "optimized_block_count": 1,
-  "old_phase_blocks_removed": true,
-  "has_project_stack": true,
-  "has_hero_motion_data": true
-}

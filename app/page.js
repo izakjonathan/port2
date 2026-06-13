@@ -9,20 +9,41 @@ export default function Home() {
   const activeCardRef = useRef(null);
   const dragFrameRef = useRef(null);
   const scrollFrameRef = useRef(null);
+  const paraFrameRef = useRef(null);
+  // New ref for unified hero motion
+  const heroFrameRef = useRef(null);
+  const liftTimersRef = useRef([]);
 
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll("[data-card-layer]"));
+    const heroCards = Array.from(document.querySelectorAll(".hero-card"));
     const revealItems = Array.from(document.querySelectorAll("[data-reveal]"));
     const projectStack = document.querySelector("[data-project-stack]");
     const projectCards = projectStack
       ? Array.from(projectStack.querySelectorAll("[data-stack-card]"))
       : [];
     const menuNodes = Array.from(document.querySelectorAll(".fixed-menu"));
+    const heroSection = document.querySelector(".home-hero");
 
     let currentDrag = null;
     let lastScrollY = window.scrollY;
     let lastTapAt = 0;
+    // Removed mouse-based parallax variables. Hero cards will now move based
+    // solely on scroll to avoid conflicting transform systems.
 
+    // ── Hero entrance ──────────────────────────────────────────────
+    // Cards start invisible (CSS sets opacity:0 before motion-ready).
+    // Stagger each hero card entrance with a direction-aware class.
+    const entranceTimers = [];
+    heroCards.forEach((card, i) => {
+      const delay = 120 + i * 110;
+      const t = window.setTimeout(() => {
+        card.classList.add("is-hero-entered");
+      }, delay);
+      entranceTimers.push(t);
+    });
+
+    // ── Helpers ────────────────────────────────────────────────────
     const resetCardLayers = () => {
       cards.forEach((card, index) => {
         card.classList.remove("is-front");
@@ -32,9 +53,14 @@ export default function Home() {
 
     const bringToFront = (card) => {
       resetCardLayers();
-      card.classList.add("is-front");
+      card.classList.add("is-front", "is-lift-pop");
       card.style.setProperty("--z", "900");
       activeCardRef.current = card;
+
+      const timer = window.setTimeout(() => {
+        card.classList.remove("is-lift-pop");
+      }, 260);
+      liftTimersRef.current.push(timer);
     };
 
     const setDragVars = (card, x, y) => {
@@ -43,10 +69,16 @@ export default function Home() {
     };
 
     const clearDrag = (card) => {
-      card.classList.remove("is-touching", "is-dragging");
+      card.classList.remove("is-dragging");
+      card.classList.add("is-releasing");
       setDragVars(card, 0, 0);
+
+      window.setTimeout(() => {
+        card.classList.remove("is-touching", "is-releasing");
+      }, 120);
     };
 
+    // ── Scroll motion ──────────────────────────────────────────────
     const updateScrollMotion = () => {
       scrollFrameRef.current = null;
 
@@ -86,18 +118,71 @@ export default function Home() {
       }
     };
 
+    // ── Unified hero motion (scroll-driven) ────────────────────────
+    // Instead of a mouse-driven parallax, we define a scroll-based offset that moves
+    // each hero card slightly as the page scrolls. This avoids competing transform
+    // values and ensures smooth animation. Motion is skipped when dragging.
+    const updateHeroMotion = () => {
+      heroFrameRef.current = null;
+      const scrollY = window.scrollY;
+      const viewportH = window.innerHeight || 1;
+      const progress = Math.max(0, Math.min(1, scrollY / Math.max(viewportH, 1)));
+
+      heroCards.forEach((card, index) => {
+        if (currentDrag?.card === card) return;
+        const dir = index % 2 === 0 ? 1 : -1;
+        const depth = parseFloat(card.dataset.depth || "1");
+        const offsetX = dir * depth * progress * 20;
+        const offsetY = (index === 1 ? -1 : 1) * depth * progress * 12;
+        const rot = dir * depth * progress * 6;
+        card.style.setProperty("--hero-x", `${offsetX.toFixed(2)}px`);
+        card.style.setProperty("--hero-y", `${offsetY.toFixed(2)}px`);
+        card.style.setProperty("--hero-r", `${rot.toFixed(2)}deg`);
+      });
+    };
+
+    const requestHeroMotion = () => {
+      if (!heroFrameRef.current) {
+        heroFrameRef.current = requestAnimationFrame(updateHeroMotion);
+      }
+    };
+
+    window.addEventListener("scroll", requestHeroMotion, { passive: true });
+    requestHeroMotion();
+
+    // ── Card event listeners ───────────────────────────────────────
     cards.forEach((card, index) => {
       card.style.setProperty("--z", String(Number(card.dataset.baseZ || index + 1)));
       card.style.setProperty("--drag-x", "0px");
       card.style.setProperty("--drag-y", "0px");
+      // Initialise unified hero offsets; para offsets remain for legacy transforms
+      card.style.setProperty("--hero-x", "0px");
+      card.style.setProperty("--hero-y", "0px");
+      card.style.setProperty("--hero-r", "0deg");
+      card.style.setProperty("--para-x", "0px");
+      card.style.setProperty("--para-y", "0px");
+      card.style.setProperty("--para-rx", "0deg");
+      card.style.setProperty("--para-ry", "0deg");
+
+      card.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      // Hover (desktop only — CSS guards with @media hover:hover)
+      card.addEventListener("mouseenter", () => {
+        if (!currentDrag) card.classList.add("is-hover");
+      });
+      card.addEventListener("mouseleave", () => {
+        card.classList.remove("is-hover");
+      });
 
       card.addEventListener("click", (event) => {
         const sameCard = activeCardRef.current === card;
         const didDrag = card.dataset.didDrag === "true";
+        const href = card.dataset.cardHref;
+
+        event.preventDefault();
+        event.stopPropagation();
 
         if (!sameCard || didDrag) {
-          event.preventDefault();
-          event.stopPropagation();
           bringToFront(card);
           card.dataset.didDrag = "false";
           lastTapAt = Date.now();
@@ -106,16 +191,43 @@ export default function Home() {
 
         const now = Date.now();
         if (now - lastTapAt < 160) {
-          event.preventDefault();
-          event.stopPropagation();
+          lastTapAt = now;
+          return;
         }
+
         lastTapAt = now;
+
+        if (href) {
+          window.location.href = href;
+        }
       }, true);
 
+      card.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+
+        const href = card.dataset.cardHref;
+        if (!href) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (activeCardRef.current !== card) {
+          bringToFront(card);
+          return;
+        }
+
+        window.location.href = href;
+      });
+
       card.addEventListener("pointerdown", (event) => {
-        bringToFront(card);
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+
+        const rect = card.getBoundingClientRect();
         card.dataset.didDrag = "false";
+        card.classList.remove("is-releasing", "is-hover");
         card.classList.add("is-touching");
+        card.style.setProperty("--tap-x", `${event.clientX - rect.left}px`);
+        card.style.setProperty("--tap-y", `${event.clientY - rect.top}px`);
 
         currentDrag = {
           card,
@@ -124,6 +236,7 @@ export default function Home() {
           startY: event.clientY,
           nextX: 0,
           nextY: 0,
+          hasMoved: false,
         };
 
         try {
@@ -137,13 +250,19 @@ export default function Home() {
         const dx = event.clientX - currentDrag.startX;
         const dy = event.clientY - currentDrag.startY;
 
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
           card.dataset.didDrag = "true";
           card.classList.add("is-dragging");
+
+          if (!currentDrag.hasMoved) {
+            currentDrag.hasMoved = true;
+            bringToFront(card);
+          }
         }
 
-        currentDrag.nextX = Math.max(-34, Math.min(34, dx * 0.26));
-        currentDrag.nextY = Math.max(-26, Math.min(26, dy * 0.2));
+        // Increased resistance factor: feels more 1:1 now
+        currentDrag.nextX = Math.max(-38, Math.min(38, dx * 0.34));
+        currentDrag.nextY = Math.max(-30, Math.min(30, dy * 0.28));
 
         if (!dragFrameRef.current) {
           dragFrameRef.current = requestAnimationFrame(() => {
@@ -167,6 +286,7 @@ export default function Home() {
       });
     });
 
+    // ── Scroll reveal ──────────────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -181,70 +301,71 @@ export default function Home() {
       observer.observe(item);
     });
 
-    const onScroll = () => {
-      requestScrollMotion();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // ── Boot ───────────────────────────────────────────────────────
+    window.addEventListener("scroll", requestScrollMotion, { passive: true });
     document.body.classList.add("motion-ready");
     requestScrollMotion();
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", requestScrollMotion);
+      // Also remove the unified hero motion listener
+      window.removeEventListener("scroll", requestHeroMotion);
       observer.disconnect();
+      // No longer need to remove mousemove/mouseleave listeners since they were not added
+      entranceTimers.forEach((t) => window.clearTimeout(t));
+      liftTimersRef.current.forEach((t) => window.clearTimeout(t));
+      liftTimersRef.current = [];
       if (dragFrameRef.current) cancelAnimationFrame(dragFrameRef.current);
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
+      if (paraFrameRef.current) cancelAnimationFrame(paraFrameRef.current);
+      if (heroFrameRef.current) cancelAnimationFrame(heroFrameRef.current);
     };
   }, []);
-
-
 
   return (
     <main className="site-home">
       <section className="home-hero" aria-label="Portfolio introduction">
         <article className="hero-card hero-card-main" data-card-layer data-base-z="30" data-depth="1" data-reveal>
           <div className="hero-card-meta">
-            <strong>Study/Clyb</strong>
-            <span>Search Work</span>
-            <span>Menu</span>
+            <strong>Izak Hyllested</strong>
+            <span>Design & Development</span>
+            <span>2026</span>
           </div>
 
           <h1>
-            <span>Turning Ideas</span>
-            Into Visual Systems And Digital Products.
+            <span>Design, Built</span>
+            To Work As Well As It Looks.
           </h1>
         </article>
 
         <article className="hero-card hero-card-strategy" data-card-layer data-base-z="65" data-depth="1.12" data-reveal>
           <div className="strategy-count">
-            12 <span>/12</span>
+            5 <span>/5</span>
           </div>
           <h2>
-            Strategy
+            Projects
             <br />
-            <span>Session</span>
+            <span>Live</span>
           </h2>
-          <p>Graphic design, logos, layouts and creative direction.</p>
+          <p>Dashboards, apps, identity systems and this site.</p>
         </article>
 
         <article className="hero-card hero-card-profile" data-card-layer data-base-z="20" data-depth=".9" data-reveal>
           <div className="profile-dots">•••</div>
           <div className="profile-dot" />
           <div className="level-ring">
-            <span>45</span>
-            <small>Level</small>
+            <span>↗</span>
           </div>
           <div className="done-count">
-            <small>Done</small>
-            <span>21</span>
+            <small>Since</small>
+            <span>&#8217;19</span>
           </div>
           <ul>
-            <li><b>S</b>Seamless</li>
-            <li><b>P</b>Powerful</li>
-            <li><b>S</b>Scalable</li>
-            <li><b>M</b>Main</li>
-            <li><b>O</b>Optimized</li>
-            <li><b>E</b>Elite</li>
+            <li><b>D</b>Design</li>
+            <li><b>T</b>Typography</li>
+            <li><b>M</b>Motion</li>
+            <li><b>P</b>Product</li>
+            <li><b>C</b>Code</li>
           </ul>
         </article>
       </section>
@@ -257,11 +378,21 @@ export default function Home() {
           <Link href="/projects">Archive</Link>
         </div>
 
-        <div className="project-card-stage" data-project-stack data-project-stack>
+        <div className="project-card-stage" data-project-stack>
           {projects.map((project, index) => (
-            <Link
-              href={`/projects/${project.slug}`}
-              className={`project-card project-card-${index + 1}`} data-card-layer data-stack-card data-base-z={90 + index} data-depth={0.7 + index * 0.08} data-reveal>
+            <article
+              key={project.slug}
+              className={`project-card project-card-${index + 1}`}
+              data-card-layer
+              data-stack-card
+              data-card-href={`/projects/${project.slug}`}
+              data-base-z={90 + index}
+              data-depth={0.7 + index * 0.08}
+              data-reveal
+              role="link"
+              tabIndex="0"
+              aria-label={`Open ${project.title}`}
+            >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{project.title}</h3>
               <p>{project.description}</p>
@@ -269,7 +400,7 @@ export default function Home() {
                 <small>{project.category}</small>
                 <small>{project.year}</small>
               </footer>
-            </Link>
+            </article>
           ))}
         </div>
       </section>
@@ -279,32 +410,32 @@ export default function Home() {
         <div className="section-heading" data-reveal>
           <span>02</span>
           <h2>Services</h2>
-          <span>Objects</span>
+          <span>Available</span>
         </div>
 
         <div className="service-card-stage">
           <article className="service-card service-card-graphic" data-card-layer data-base-z="120" data-depth=".8" data-reveal>
             <span>01</span>
             <h3>Graphic Design</h3>
-            <p>Logos, typography, menus, posters, print systems and visual identity.</p>
+            <p>Identity, typography, print and visual systems built to last.</p>
           </article>
 
           <article className="service-card service-card-web" data-card-layer data-base-z="125" data-depth=".95" data-reveal>
             <span>02</span>
             <h3>Web Design</h3>
-            <p>Editorial websites, portfolios, landing pages and interaction-led layouts.</p>
+            <p>Editorial sites, portfolios and interaction-led layouts.</p>
           </article>
 
           <article className="service-card service-card-dev" data-card-layer data-base-z="130" data-depth=".9" data-reveal>
             <span>03</span>
             <h3>Development</h3>
-            <p>Next.js builds, dashboards, custom tools, automation and deployment.</p>
+            <p>Next.js builds, dashboards, custom tools and deployment.</p>
           </article>
 
           <article className="service-card service-card-editorial" data-card-layer data-base-z="115" data-depth=".75" data-reveal>
             <span>04</span>
             <h3>Editorial</h3>
-            <p>Reports, presentations, publications and information design.</p>
+            <p>Reports, publications and information design.</p>
           </article>
         </div>
       </section>
@@ -312,7 +443,7 @@ export default function Home() {
       <section className="about-section" data-reveal id="about">
         <span>03 / Profile</span>
         <p>
-          I build visual systems, mobile-first web apps, editorial interfaces and experimental digital identities with a focus on typography, atmosphere and interaction.
+          Visual systems, mobile-first web apps and editorial interfaces — made with care for typography, motion and the details that separate something finished from something done.
         </p>
         <a href="mailto:izakhyllested@icloud.com">Contact</a>
       </section>

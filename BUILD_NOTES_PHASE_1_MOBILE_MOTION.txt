@@ -1,7 +1,0 @@
-{
-  "source": "/mnt/data/portfolio-reference-collage-v12-hard-actual-fixes.zip",
-  "hero_main_data": true,
-  "hero_strategy_data": true,
-  "hero_profile_data": true,
-  "single_phase1_block": true
-}
